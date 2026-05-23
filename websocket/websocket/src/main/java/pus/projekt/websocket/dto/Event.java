@@ -1,12 +1,13 @@
 package pus.projekt.websocket.dto;
 
+import pus.projekt.websocket.enums.Status;
+import pus.projekt.websocket.enums.Type;
+
 import java.time.LocalDateTime;
 
 public record Event(
-        // TODO enum?
-        String type,
-        // TODO enum?
-        String status,
+        Type type,
+        Status status,
         Payload payload,
         MetaEvent metaEvent
 ) {

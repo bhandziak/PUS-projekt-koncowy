@@ -1,9 +1,9 @@
 package pus.projekt.websocket.dto;
 
-public record Request(
-        // TODO moze warto zmienic ze Stringa na Enum
-        String type,
+import pus.projekt.websocket.enums.Type;
 
+public record Request(
+        Type type,
         Payload payload,
         String token,
         Meta meta
