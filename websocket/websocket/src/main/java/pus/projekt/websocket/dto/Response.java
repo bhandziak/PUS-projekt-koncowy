@@ -23,4 +23,8 @@ public record Response(
     public static Response success(Type type, String action, Map<String, Object> data, Meta meta) {
         return new Response(type, Status.OK, new Payload(action, data), null, meta);
     }
+
+    public static Response error(Type type, Payload originalPayload, ErrorCode code, String message, Meta meta) {
+        return new Response(type, Status.FAIL, originalPayload, new ErrorDTO(code, message), meta);
+    }
 }
