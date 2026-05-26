@@ -59,7 +59,6 @@ public class HandshakeHandler implements MessageHandler {
     }
 
     private void sendErrorResponse(WebSocketSession session, Payload originalPayload, ErrorCode code, String message, Meta meta) throws IOException {
-        // Używamy Type.HANDSHAKE zgodnie z dokumentacja
         Response errorResponse = Response.error(Type.HANDSHAKE, originalPayload, code, message, meta);
         session.sendMessage(new TextMessage(objectMapper.writeValueAsString(errorResponse)));
     }

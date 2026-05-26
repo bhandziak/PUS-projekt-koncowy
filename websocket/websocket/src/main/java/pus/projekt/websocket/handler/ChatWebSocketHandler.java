@@ -14,8 +14,10 @@ import pus.projekt.websocket.enums.Type;
 import tools.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -46,6 +48,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
             if (request.type() == null) {
                 sendErrorResponse(
                         session,
+                        Type.ERROR,
                         request.payload(),
                         ErrorCode.MISSING_FIELD,
                         "Required field 'type' is missing",
@@ -54,7 +57,13 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
                 return;
             }
             if (request.meta() == null || request.meta().packet_id() == null) {
-                // TODO send error response
+                sendErrorResponse(
+                        session,
+                        request.type(),
+                        request.payload(),
+                        ErrorCode.MISSING_FIELD,
+                        "Missing 'meta' or 'packet_id'",
+                        fallbackMeta(request.meta()));
                 return;
             }
             MessageHandler handler = handlers.get(request.type());
@@ -66,6 +75,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
                 // UNKNOWN_TYPE
                 sendErrorResponse(
                         session,
+                        request.type(),
                         request.payload(),
                         ErrorCode.UNKNOWN_TYPE,
                         "Unknown message type: " + request.type(),
@@ -73,10 +83,14 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
                 );
             }
         } catch (Exception exception) {
-            // TODO change error message
-            System.out.println("Bad syntax error");
-            String syntaxError = "{\"type\":\"ERROR\", \"status\":\"FAIL\", \"error\": {\"code\": \"BAD_SYNTAX\"}}";
-            session.sendMessage(new TextMessage(syntaxError));
+            System.out.println("Bad syntax error: " + exception.getMessage());
+            sendErrorResponse(
+                    session,
+                    Type.ERROR,
+                    null,
+                    ErrorCode.BAD_SYNTAX,
+                    "Invalid JSON format",
+                    fallbackMeta(null));
         }
     }
 
@@ -85,15 +99,15 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
         System.out.println("Session closed. Session id: " + session.getId());
     }
 
-    private void sendErrorResponse(WebSocketSession session, Payload originalPayload, ErrorCode code, String message, Meta meta) throws IOException {
-        /*
-        ERROR - globalna odpowiedź serwera na zapytania klienta w momencie  niepowodzenia operacji.
-        To stan, w którym status przyjmuje wartość “fail”, type i payload.action zostaje taki sam jak w zapytaniu klienta.
-        Dzięki temu frontend może łatwiej adresować błędy / sukcesy.
-         */
-        // TODO z dokumentacji wynika ze Type.ERROR nie powinien istnieć ale troche tego nie czaje
-
-        Response errorResponse = Response.error(Type.ERROR, originalPayload, code, message, meta);
+    private void sendErrorResponse(WebSocketSession session, Type messageType, Payload originalPayload, ErrorCode code, String message, Meta meta) throws IOException {
+        Response errorResponse = Response.error(messageType, originalPayload, code, message, meta);
         session.sendMessage(new TextMessage(objectMapper.writeValueAsString(errorResponse)));
+    }
+
+    private Meta fallbackMeta(Meta originalMeta) {
+        if (originalMeta != null && originalMeta.packet_id() != null) {
+            return originalMeta;
+        }
+        return new Meta("1.0.0", UUID.randomUUID(), LocalDateTime.now());
     }
 }
