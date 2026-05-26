@@ -16,12 +16,50 @@ this will start postgres db that is necessary for backend to exist
 
    In message paste something like this:
 
-    `{ 
-    "type": "HANDSHAKE", 
-    "payload": 
-    { 
-        "action": "hello" 
-    } 
+    `{
+  "type": "HANDSHAKE",
+  "payload": {
+    "action": "hello"
+  },
+  "meta": {
+    "version": "1.0.0",
+    "packet_id": "123e4567-e89b-12d3-a456-426614174000",
+    "timestamp": "2026-05-26T11:26:50.9531269"
+  }
 } `
  
     and then click send
+
+## ENDPOINTS
+### handshake/hello
+
+` {
+  "type": "HANDSHAKE",
+  "payload": {
+    "action": "hello"
+  },
+  "meta": {
+    "version": "1.0.0",
+    "packet_id": "123e4567-e89b-12d3-a456-426614174000",
+    "timestamp": "2026-05-26T11:26:50.9531269"
+  }
+}`
+
+### auth/register
+
+`{
+   "type": "AUTH",
+   "payload": {
+   "action": "register",
+   "data": {
+   "username": "testuser",
+   "password": "SuperSecretPassword123"
+   }
+   },
+   "meta": {
+   "version": "1.0.0",
+   "packet_id": "123e4567-e89b-12d3-a456-426614174000",
+   "timestamp": "2026-05-26T11:26:50.9531269"
+   }
+   }
+ `
