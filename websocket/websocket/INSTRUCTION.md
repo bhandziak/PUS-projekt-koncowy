@@ -63,3 +63,22 @@ this will start postgres db that is necessary for backend to exist
    }
    }
  `
+
+### auth/login
+
+`{
+   "type": "AUTH",
+   "payload": {
+   "action": "login",
+   "data": {
+   "username": "testuser",
+   "password": "SuperSecretPassword123"
+   }
+   },
+   "meta": {
+   "version": "1.0.0",
+   "packet_id": "123e4567-e89b-12d3-a456-426614174000",
+   "timestamp": "2026-05-26T11:26:50.9531269"
+   }
+   }
+ `
