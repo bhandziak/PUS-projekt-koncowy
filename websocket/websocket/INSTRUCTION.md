@@ -82,3 +82,23 @@ this will start postgres db that is necessary for backend to exist
    }
    }
  `
+
+### auth/refresh_token
+
+`
+{
+  "type": "AUTH",
+  "payload": {
+    "action": "refresh_token",
+    "data": {
+      "refreshToken": "TUTAJ_WKLEJ_SWOJ_REFRESH_TOKEN"
+    }
+  },
+  "token": "wyekspirowany_access_token_albo_puste_pole",
+  "meta": {
+    "version": "1.0.0",
+    "packet_id": "848b3075-8bd4-49c0-994c-8bbbb7257000",
+    "timestamp": "2026-05-26T11:26:50.9531269"
+  }
+}
+`

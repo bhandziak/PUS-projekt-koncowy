@@ -53,6 +53,9 @@ public class AuthHandler implements MessageHandler {
             case "logout":
                 // TODO add logout
                 break;
+            case "refresh_token":
+                handleRefreshToken(session, request, meta);
+                break;
             default:
                 sendError(session, request.payload(), ErrorCode.UNKNOWN_ACTION, "Nieznana akcja dla typu AUTH", meta);
                 break;
@@ -148,6 +151,56 @@ public class AuthHandler implements MessageHandler {
                     "Niepoprawny format danych",
                     meta
             );
+        }
+    }
+
+    private void handleRefreshToken(WebSocketSession session, Request request, Meta meta) throws IOException {
+        try {
+            RefreshTokenData data = objectMapper.convertValue(request.payload().data(), RefreshTokenData.class);
+
+            if (data.refreshToken() == null || data.refreshToken().isBlank()) {
+                sendError(session, request.payload(), ErrorCode.VALIDATION_ERROR, "Brak tokenu odświeżania", meta);
+                return;
+            }
+
+            String incomingRefreshToken = data.refreshToken();
+
+            if (!jwtService.isTokenValid(incomingRefreshToken)) {
+                sendError(
+                        session,
+                        request.payload(),
+                        ErrorCode.UNAUTHORIZED,
+                        "Token odświeżania wygasł lub jest nieprawidłowy",
+                        meta);
+                return;
+            }
+
+            String userIdString = jwtService.extractUserId(incomingRefreshToken);
+            UUID userId = UUID.fromString(userIdString);
+
+            Optional<User> userOptional = userRepository.findById(userId);
+            if (userOptional.isEmpty()) {
+                sendError(session, request.payload(), ErrorCode.UNAUTHORIZED, "Użytkownik powiązany z tym tokenem już nie istnieje", meta);
+                return;
+            }
+
+            User user = userOptional.get();
+
+            String newAccessToken = jwtService.generateAccessToken(user);
+            String newRefreshToken = jwtService.generateRefreshToken(user);
+
+            Map<String, Object> responseData = Map.of(
+                    "accessToken", newAccessToken,
+                    "refreshToken", newRefreshToken,
+                    "expiresIn", 900 // 15 minut (w sekundach)
+            );
+
+            Meta successMeta = new Meta("1.0.0", UUID.randomUUID(), LocalDateTime.now());
+            Response successResponse = Response.success(Type.AUTH, "refresh_token", responseData, successMeta);
+
+            session.sendMessage(new TextMessage(objectMapper.writeValueAsString(successResponse)));
+        } catch (IllegalArgumentException e) {
+            sendError(session, request.payload(), ErrorCode.INVALID_DATA_TYPE, "Niepoprawny format danych tokenu", meta);
         }
     }
 

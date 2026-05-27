@@ -38,6 +38,27 @@ public class JwtService {
                 .signWith(key)
                 .compact();
     }
+
+    public boolean isTokenValid(String token) {
+        try {
+            Jwts.parser()
+                    .verifyWith(key)
+                    .build()
+                    .parseSignedClaims(token);
+            return true;
+        } catch (Exception exception) {
+            return false;
+        }
+    }
+
+    public String extractUserId(String token) {
+        return Jwts.parser()
+                .verifyWith(key)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload()
+                .getSubject();
+    }
 }
 
 
