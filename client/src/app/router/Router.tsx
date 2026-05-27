@@ -7,10 +7,10 @@ const Router = () => {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <Routes>
-            {PublicRoutes()}
-            {PrivateRoutes()}
-        </Routes>
+          <Routes>
+              {PublicRoutes()}
+              {PrivateRoutes()}
+          </Routes>
       </AuthProvider>
     </BrowserRouter>
   );

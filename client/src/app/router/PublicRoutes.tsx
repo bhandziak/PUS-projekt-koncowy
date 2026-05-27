@@ -6,13 +6,14 @@ import { ROUTES } from "./routePaths";
 import DefaultPage from "../../pages/public/error/DefaultPage";
 import ForbiddenPage from "../../pages/public/error/ForbiddenPage";
 import UnauthorizedPage from "../../pages/public/error/UnauthorizedPage";
+import HomePage from "../../pages/public/HomePage";
 
 const PublicRoutes = () => {
     return (
         <>
             {/* <Route path={ROUTES.LOGIN} element={<LoginPage />} />
-            <Route path={ROUTES.REGISTER} element={<RegisterPage />} />
-            <Route path={ROUTES.HOME} element={<LoginPage />} /> */}
+            <Route path={ROUTES.REGISTER} element={<RegisterPage />} /> */}
+            <Route path={ROUTES.HOME} element={<HomePage />} />
 
             { /* 404 page */}
             <Route path={ROUTES.NOT_FOUND} element={<DefaultPage />} />
