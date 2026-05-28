@@ -77,7 +77,7 @@ public class RoomHandler implements MessageHandler {
                     handleJoin(session, request, token, meta);
                     break;
                 case "leave":
-                    // TODO add logic
+                    handleLeave(session, request, token, meta);
                     break;
                 default:
                     sendError(
@@ -254,6 +254,26 @@ public class RoomHandler implements MessageHandler {
                     meta
             );
         }
+    }
+
+    private void handleLeave(WebSocketSession session, Request request, String token, Meta meta) throws IOException {
+        RoomActionData data = objectMapper.convertValue(request.payload().data(), RoomActionData.class);
+
+        if (data.room_id() == null || data.room_id().isBlank()) {
+            sendError(session, request.payload(), ErrorCode.VALIDATION_ERROR, "Brak identyfikatora pokoju", meta);
+            return;
+        }
+
+        // TODO SessionManager:
+        // 1. Sprawdź, czy użytkownik faktycznie jest subskrybentem tego pokoju.
+        // Jeśli nie jest -> wyrzuć sendError(..., NOT_IN_ROOM, ...)
+        // Jeśli jest -> usuń go z pokoju
+
+        Map<String, Object> responseData = Map.of(
+                "room_id", data.room_id(),
+                "message", "Opuściłeś pokój"
+        );
+        sendSuccess(session, "leave", responseData, meta);
     }
 
     private void sendSuccess(WebSocketSession session, String action, Map<String, Object> responseData, Meta meta) throws IOException {
