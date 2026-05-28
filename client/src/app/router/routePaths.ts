@@ -3,6 +3,9 @@ export const ROUTES = {
   REGISTER: "/register",
   HOME: "/",
   
+  CHAT: "/chat",
+  CREATE_ROOM: "/create-room",
+
   FORBIDDEN: "/not-authorized",
   UNAUTHORIZED: "/not-authenticated",
   NOT_FOUND: "*",

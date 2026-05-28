@@ -10,6 +10,8 @@ export interface AuthContextType {
   isAuthenticated: boolean;
 }
 
+// TODO - refresh token handling, token expiration check
+
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 type AuthProviderProps = {
