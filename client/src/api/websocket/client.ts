@@ -1,24 +1,50 @@
 import APIs from '../ApiURL';
+/*
+ * SINGLETON - global WebSocket client
+ */
+
+type WebSocketResolver = (response: any) => void;
+const pendingRequests = new Map<string, WebSocketResolver>();
 
 export const socket = new WebSocket(APIs.SERVER_URL);
 
 socket.onopen = () => {
-    console.log('Natywny WebSocket: Połączono pomyślnie z serwerem Spring!');
+    console.log('WebSocket: Connected to server!');
 };
 
 socket.onmessage = (event) => {
     try {
         const responseData = JSON.parse(event.data);
-        console.log('Natywny WebSocket: Odebrano pakiet:', responseData);
+        console.log('WebSocket: Got new message from server:', responseData);
+
+        const packetId = responseData.meta?.packet_id;
+
+        if (packetId && pendingRequests.has(packetId)) {
+            const resolve = pendingRequests.get(packetId);
+            if (resolve) {
+                resolve(responseData);
+                pendingRequests.delete(packetId);
+            }
+        } else {
+            console.log('Broadcast or unassociated packet_id:', responseData);
+        }
     } catch (e) {
-        console.log('Natywny WebSocket: Odebrano wiadomość tekstową:', event.data);
+        console.error('WebSocket: Error parsing message:', event.data, e);
     }
 };
 
-socket.onerror = (error) => {
-    console.error('Natywny WebSocket: Błąd połączenia:', error);
-};
+socket.onerror = (error) => console.error('WebSocket: Error:', error);
+socket.onclose = () => console.warn('WebSocket: Connection closed.');
 
-socket.onclose = () => {
-    console.warn('Natywny WebSocket: Połączenie zostało zamknięte.');
+
+export const registerPendingRequest = (packetId: string, resolver: WebSocketResolver) => {
+    pendingRequests.set(packetId, resolver);
+
+    // packet has 10 seconds to be resolved, otherwise it will be removed from pending requests
+    setTimeout(() => {
+        if (pendingRequests.has(packetId)) {
+            console.warn(`WebSocket: Packet with ID ${packetId} timeout.`);
+            pendingRequests.delete(packetId);
+        }
+    }, 10000);
 };
