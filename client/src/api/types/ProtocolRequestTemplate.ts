@@ -10,6 +10,6 @@ export interface ProtocolRequestTemplate<T = any> {
   meta: {
     version: string;
     packet_id: string;
-    timestamp: string;
+    timestamp: number;
   };
 }

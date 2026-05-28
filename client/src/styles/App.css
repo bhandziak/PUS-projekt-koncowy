@@ -1,1 +1,47 @@
 @import "tailwindcss";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  /* Tło całej strony - głęboka czerń */
+  .dark-auth-bg {
+    @apply min-h-screen flex items-center justify-center bg-zinc-950 text-zinc-100 px-4 sm:px-6 lg:px-8 font-sans;
+  }
+
+  /* Karta formularza - ciemny grafit z delikatną, jasnoniebieską poświatą */
+  .dark-auth-card {
+    @apply max-w-md w-full space-y-6 bg-zinc-900 p-8 rounded-2xl border border-zinc-800 shadow-2xl shadow-sky-950/20;
+  }
+
+  /* Etykiety pól */
+  .dark-auth-label {
+    @apply block text-sm font-medium text-sky-400 mb-1;
+  }
+
+  /* Inputy - czarne tło, jasny tekst, błękitny focus */
+  .dark-auth-input {
+    @apply w-full px-3 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-zinc-200 placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 text-sm transition-all duration-200;
+  }
+
+  /* Przycisk główny - czarny tekst na jasnoniebieskim, neonowym tle */
+  .dark-auth-btn-primary {
+    @apply w-full flex justify-center py-3 px-4 border border-transparent rounded-xl text-sm font-bold text-zinc-950 bg-sky-400 hover:bg-sky-300 active:scale-[0.99] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-zinc-900 focus:ring-sky-400 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:transform-none shadow-lg shadow-sky-500/20;
+  }
+
+  /* Linki alternatywne */
+  .dark-auth-link {
+    @apply font-medium text-sky-400 hover:text-sky-300 transition-colors duration-200 underline decoration-sky-500/30 hover:decoration-sky-400;
+  }
+
+  /* Alerty błędów */
+  .dark-auth-alert-error {
+    @apply p-3 bg-red-950/40 border border-red-800/60 text-red-400 rounded-xl text-sm font-medium;
+  }
+
+  /* Alerty sukcesów */
+  .dark-auth-alert-success {
+    @apply p-4 bg-emerald-950/40 border border-emerald-800/60 text-emerald-400 rounded-xl text-sm font-medium text-center;
+  }
+}

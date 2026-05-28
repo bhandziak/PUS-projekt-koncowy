@@ -34,7 +34,7 @@ const Navbar = () => {
             
             <div className="text-right hidden sm:block">
               <div className="text-sm font-bold text-gray-900 leading-tight">
-                {user.username || user.email || 'Użytkownik'} 
+                {user.username || 'Użytkownik'} 
               </div>
               <div className="text-xs font-bold text-indigo-600 uppercase tracking-wide mt-0.5">
                 {user.role}

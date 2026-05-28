@@ -2,7 +2,7 @@ import { Route } from "react-router-dom";
 import { ROUTES } from "./routePaths";
 
 // import LoginPage from "../../pages/public/LoginPage";
-// import RegisterPage from "../../pages/public/RegisterPage";
+import RegisterPage from "../../pages/public/RegisterPage";
 import DefaultPage from "../../pages/public/error/DefaultPage";
 import ForbiddenPage from "../../pages/public/error/ForbiddenPage";
 import UnauthorizedPage from "../../pages/public/error/UnauthorizedPage";
@@ -11,8 +11,9 @@ import HomePage from "../../pages/public/HomePage";
 const PublicRoutes = () => {
     return (
         <>
-            {/* <Route path={ROUTES.LOGIN} element={<LoginPage />} />
-            <Route path={ROUTES.REGISTER} element={<RegisterPage />} /> */}
+            {/* <Route path={ROUTES.LOGIN} element={<LoginPage />} /> */}
+            <Route path={ROUTES.REGISTER} element={<RegisterPage />} />
+
             <Route path={ROUTES.HOME} element={<HomePage />} />
 
             { /* 404 page */}

@@ -27,6 +27,8 @@ export const useWebSocket = (isAuth: boolean = true) => {
 
                 // 2. Send packet to the server
                 socket.send(JSON.stringify(packet));
+
+                console.log('WebSocket: Sent packet to server:', packet);
             } else {
                 console.warn("WebSocket: Brak aktywnego połączenia!");
                 reject(new Error("Brak połączenia z serwerem"));

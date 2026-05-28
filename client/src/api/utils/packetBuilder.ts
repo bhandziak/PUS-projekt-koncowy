@@ -16,7 +16,7 @@ export const createWebSocketPacket = <T = any>(
     meta: {
       version: "1.0.0",
       packet_id: crypto.randomUUID(),
-      timestamp: new Date().toISOString(),
+      timestamp: Math.floor(Date.now() / 1000),
     },
   };
 };

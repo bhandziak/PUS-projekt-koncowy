@@ -15,7 +15,6 @@ socket.onopen = () => {
 socket.onmessage = (event) => {
     try {
         const responseData = JSON.parse(event.data);
-        console.log('WebSocket: Got new message from server:', responseData);
 
         const packetId = responseData.meta?.packet_id;
 
@@ -25,6 +24,7 @@ socket.onmessage = (event) => {
                 resolve(responseData);
                 pendingRequests.delete(packetId);
             }
+            console.log('WebSocket: Received response for packet_id', packetId, responseData);
         } else {
             console.log('Broadcast or unassociated packet_id:', responseData);
         }
