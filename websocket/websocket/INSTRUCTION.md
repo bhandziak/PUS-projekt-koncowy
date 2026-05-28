@@ -71,8 +71,8 @@ this will start postgres db that is necessary for backend to exist
    "payload": {
    "action": "login",
    "data": {
-   "username": "testuser",
-   "password": "SuperSecretPassword123"
+   "username": "andrzej",
+   "password": "12345"
    }
    },
    "meta": {
