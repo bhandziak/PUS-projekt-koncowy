@@ -5,10 +5,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import pus.projekt.websocket.config.TimestampConverter;
-import pus.projekt.websocket.dto.Meta;
-import pus.projekt.websocket.dto.Payload;
-import pus.projekt.websocket.dto.Request;
-import pus.projekt.websocket.dto.Response;
+import pus.projekt.websocket.dto.*;
 import pus.projekt.websocket.enums.ErrorCode;
 import pus.projekt.websocket.enums.Type;
 import pus.projekt.websocket.repository.RoomRepository;
@@ -16,7 +13,10 @@ import pus.projekt.websocket.service.JwtService;
 import tools.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Component
 @AllArgsConstructor
@@ -50,6 +50,8 @@ public class RoomHandler implements MessageHandler {
         try {
             switch (action) {
                 case "list":
+                    handleList(session, request, meta);
+                    break;
                 case "create":
                 case "delete":
                 case "join":
@@ -63,6 +65,26 @@ public class RoomHandler implements MessageHandler {
         } catch (IllegalArgumentException e) {
             sendError(session, request.payload(), ErrorCode.INVALID_DATA_TYPE, "Niepoprawny format danych", meta);
         }
+    }
+
+    private void handleList(WebSocketSession session, Request request, Meta meta) throws IOException {
+        List<RoomDataResponse> rooms = roomRepository.findAll().stream()
+                .map(room -> new RoomDataResponse(
+                        room.getId().toString(),
+                        room.getName(),
+                        room.getOwnerName(),
+                        room.getOwnerId().toString()
+                ))
+                .collect(Collectors.toList());
+
+        Map<String, Object> responseData = Map.of("rooms", rooms);
+        sendSuccess(session, "list", responseData, meta);
+    }
+
+    private void sendSuccess(WebSocketSession session, String action, Map<String, Object> responseData, Meta meta) throws IOException {
+        Meta successMeta = new Meta(meta.version(), meta.packet_id(), TimestampConverter.currentToSeconds());
+        Response successResponse = Response.success(Type.ROOM, action, responseData, successMeta);
+        session.sendMessage(new TextMessage(objectMapper.writeValueAsString(successResponse)));
     }
 
     private void sendError(WebSocketSession session, Payload originalPayload, ErrorCode code, String message, Meta meta) throws IOException {
