@@ -7,7 +7,9 @@ import org.springframework.web.socket.WebSocketSession;
 import pus.projekt.websocket.config.TimestampConverter;
 import pus.projekt.websocket.dto.*;
 import pus.projekt.websocket.enums.ErrorCode;
+import pus.projekt.websocket.enums.Status;
 import pus.projekt.websocket.enums.Type;
+import pus.projekt.websocket.manager.SessionManager;
 import pus.projekt.websocket.model.Room;
 import pus.projekt.websocket.model.UserRole;
 import pus.projekt.websocket.repository.RoomRepository;
@@ -27,6 +29,7 @@ public class RoomHandler implements MessageHandler {
     private final ObjectMapper objectMapper;
     private final RoomRepository roomRepository;
     private final JwtService jwtService;
+    private final SessionManager sessionManager;
 
     @Override
     public Type getSupportedType() {
@@ -190,13 +193,24 @@ public class RoomHandler implements MessageHandler {
             }
 
             roomRepository.deleteById(roomId);
-
+            sessionManager.removeRoom(roomId.toString());
             Map<String, Object> responseData = Map.of("room_id", data.room_id());
             sendSuccess(session, "delete", responseData, meta);
 
-            // TODO SessionManager:
-            // 1. Wyrzuć wszystkich subskrybentów z tego pokoju
-            // 2. Wyślij event ROOM/list_updated (change_type: "deleted") do wszystkich
+
+            Map<String, Object> eventData = Map.of(
+                    "change_type", "deleted",
+                    "room_id", data.room_id()
+            );
+            Event.MetaEvent metaEvent = new Event.MetaEvent("1.0.0", TimestampConverter.currentToSeconds());
+            Event deleteEvent = new Event(
+                    Type.ROOM,
+                    Status.OK,
+                    new Payload("list_updated", eventData),
+                    metaEvent
+            );
+            sessionManager.broadcastToAll(deleteEvent);
+
         } catch (IllegalArgumentException exception) {
             sendError(
                     session,
@@ -236,8 +250,7 @@ public class RoomHandler implements MessageHandler {
                 return;
             }
 
-            // TODO SessionManager:
-            // 1. Przypisz session.getId() do subskrypcji tego roomId
+            sessionManager.joinRoom(roomId.toString(), session);
 
             Map<String, Object> responseData = Map.of(
                     "room_id", data.room_id(),
@@ -263,12 +276,7 @@ public class RoomHandler implements MessageHandler {
             sendError(session, request.payload(), ErrorCode.VALIDATION_ERROR, "Brak identyfikatora pokoju", meta);
             return;
         }
-
-        // TODO SessionManager:
-        // 1. Sprawdź, czy użytkownik faktycznie jest subskrybentem tego pokoju.
-        // Jeśli nie jest -> wyrzuć sendError(..., NOT_IN_ROOM, ...)
-        // Jeśli jest -> usuń go z pokoju
-
+        sessionManager.leaveRoom(data.room_id(), session);
         Map<String, Object> responseData = Map.of(
                 "room_id", data.room_id(),
                 "message", "Opuściłeś pokój"
