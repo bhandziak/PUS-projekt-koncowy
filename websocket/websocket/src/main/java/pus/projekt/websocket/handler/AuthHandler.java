@@ -88,11 +88,13 @@ public class AuthHandler implements MessageHandler {
     private void handleRegister(WebSocketSession session, Request request, Meta meta) throws IOException {
         AuthData authData = objectMapper.convertValue(request.payload().data(), AuthData.class);
 
+        var newPayload = new Payload(request.payload().action(), null);
+
         if (authData.username() == null || authData.username().isBlank() ||
                 authData.password() == null || authData.password().isBlank()) {
             sendError(
                     session,
-                    request.payload(),
+                    newPayload,
                     ErrorCode.VALIDATION_ERROR,
                     "Login i hasło nie mogą być puste",
                     meta
@@ -103,7 +105,7 @@ public class AuthHandler implements MessageHandler {
         if (userRepository.findByUsername(authData.username()).isPresent()) {
             sendError(
                     session,
-                    request.payload(),
+                    newPayload,
                     ErrorCode.VALIDATION_ERROR,
                     "Użytkownik o podanej nazwie już istnieje",
                     meta
