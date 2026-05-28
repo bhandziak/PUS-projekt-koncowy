@@ -74,6 +74,8 @@ public class RoomHandler implements MessageHandler {
                     handleDelete(session, request, token, meta);
                     break;
                 case "join":
+                    handleJoin(session, request, token, meta);
+                    break;
                 case "leave":
                     // TODO add logic
                     break;
@@ -195,6 +197,54 @@ public class RoomHandler implements MessageHandler {
             // TODO SessionManager:
             // 1. Wyrzuć wszystkich subskrybentów z tego pokoju
             // 2. Wyślij event ROOM/list_updated (change_type: "deleted") do wszystkich
+        } catch (IllegalArgumentException exception) {
+            sendError(
+                    session,
+                    request.payload(),
+                    ErrorCode.INVALID_DATA_TYPE,
+                    "Niepoprawny format UUID pokoju",
+                    meta
+            );
+        }
+    }
+
+    private void handleJoin(WebSocketSession session, Request request, String token, Meta meta) throws IOException {
+        RoomActionData data = objectMapper.convertValue(request.payload().data(), RoomActionData.class);
+
+        if (data.room_id() == null || data.room_id().isBlank()) {
+            sendError(
+                    session,
+                    request.payload(),
+                    ErrorCode.VALIDATION_ERROR,
+                    "Brak identyfikatora pokoju",
+                    meta
+            );
+            return;
+        }
+
+        try {
+            UUID roomId = UUID.fromString(data.room_id());
+
+            if (!roomRepository.existsById(roomId)) {
+                sendError(
+                        session,
+                        request.payload(),
+                        ErrorCode.NOT_FOUND,
+                        "Pokój do którego próbujesz dołączyć nie istnieje",
+                        meta
+                );
+                return;
+            }
+
+            // TODO SessionManager:
+            // 1. Przypisz session.getId() do subskrypcji tego roomId
+
+            Map<String, Object> responseData = Map.of(
+                    "room_id", data.room_id(),
+                    "message", "Dołączono do pokoju"
+            );
+            sendSuccess(session, "join", responseData, meta);
+
         } catch (IllegalArgumentException exception) {
             sendError(
                     session,
