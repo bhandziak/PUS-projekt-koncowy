@@ -6,6 +6,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
+import pus.projekt.websocket.config.TimestampConverter;
 import pus.projekt.websocket.dto.*;
 import pus.projekt.websocket.enums.ErrorCode;
 import pus.projekt.websocket.enums.Type;
@@ -15,7 +16,6 @@ import pus.projekt.websocket.service.JwtService;
 import tools.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -35,7 +35,7 @@ public class AuthHandler implements MessageHandler {
 
     @Override
     public void handle(WebSocketSession session, Request request) throws IOException {
-        Meta meta = request.meta() != null ? request.meta() : new Meta("1.0.0", UUID.randomUUID(), LocalDateTime.now());
+        Meta meta = request.meta() != null ? request.meta() : new Meta("1.0.0", UUID.randomUUID(), TimestampConverter.currentToSeconds());
 
         if (request.payload() == null || request.payload().action() == null) {
             sendError(
@@ -206,7 +206,7 @@ public class AuthHandler implements MessageHandler {
     }
 
     private void sendSuccess(WebSocketSession session, String action, Map<String, Object> responseData, Meta meta) throws IOException {
-        Meta successMeta = new Meta("1.0.0", meta.packet_id(), LocalDateTime.now());
+        Meta successMeta = new Meta("1.0.0", meta.packet_id(), TimestampConverter.currentToSeconds());
         Response successResponse = Response.success(Type.AUTH, action, responseData, successMeta);
         session.sendMessage(new TextMessage(objectMapper.writeValueAsString(successResponse)));
     }
