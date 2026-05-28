@@ -71,6 +71,8 @@ public class RoomHandler implements MessageHandler {
                     handleCreate(session, request, token, meta);
                     break;
                 case "delete":
+                    handleDelete(session, request, token, meta);
+                    break;
                 case "join":
                 case "leave":
                     // TODO add logic
@@ -162,6 +164,46 @@ public class RoomHandler implements MessageHandler {
         );
 
         sendSuccess(session, "create", responseData, meta);
+    }
+
+    private void handleDelete(WebSocketSession session, Request request, String token, Meta meta) throws IOException {
+        String roleString = jwtService.extractRole(token);
+        if (!UserRole.ADMIN.name().equals(roleString)) {
+            sendError(session, request.payload(), ErrorCode.FORBIDDEN, "Brak uprawnień do usunięcia pokoju", meta);
+            return;
+        }
+
+        RoomActionData data = objectMapper.convertValue(request.payload().data(), RoomActionData.class);
+
+        if (data.room_id() == null || data.room_id().isBlank()) {
+            sendError(session, request.payload(), ErrorCode.VALIDATION_ERROR, "Brak identyfikatora pokoju", meta);
+            return;
+        }
+
+        try {
+            UUID roomId = UUID.fromString(data.room_id());
+            if (!roomRepository.existsById(roomId)) {
+                sendError(session, request.payload(), ErrorCode.NOT_FOUND, "Pokój o podanym ID nie istnieje", meta);
+                return;
+            }
+
+            roomRepository.deleteById(roomId);
+
+            Map<String, Object> responseData = Map.of("room_id", data.room_id());
+            sendSuccess(session, "delete", responseData, meta);
+
+            // TODO SessionManager:
+            // 1. Wyrzuć wszystkich subskrybentów z tego pokoju
+            // 2. Wyślij event ROOM/list_updated (change_type: "deleted") do wszystkich
+        } catch (IllegalArgumentException exception) {
+            sendError(
+                    session,
+                    request.payload(),
+                    ErrorCode.INVALID_DATA_TYPE,
+                    "Niepoprawny format UUID pokoju",
+                    meta
+            );
+        }
     }
 
     private void sendSuccess(WebSocketSession session, String action, Map<String, Object> responseData, Meta meta) throws IOException {
