@@ -42,7 +42,7 @@ public class HandshakeHandler implements MessageHandler {
         String action = request.payload().action();
 
         if (action.equals("hello")) {
-            handleHello(session, request);
+            handleHello(session, request, meta);
         } else if (action.equals("bye")) {
             System.out.println("Client ends the connection.");
         } else {
@@ -50,9 +50,10 @@ public class HandshakeHandler implements MessageHandler {
         }
     }
 
-    private void handleHello(WebSocketSession session, Request request) throws IOException {
+    private void handleHello(WebSocketSession session, Request request, Meta clientMeta) throws IOException {
         System.out.println("handle hello");
-        Meta successMeta = new Meta("1.0.0", UUID.randomUUID(), LocalDateTime.now());
+
+        Meta successMeta = new Meta("1.0.0", clientMeta.packet_id(), LocalDateTime.now()); //clientMeta packet id
         Map<String, Object> responseData = Map.of("message", "Witaj na serwerze IRC");
         Response handshakeAck = Response.success(Type.HANDSHAKE, "hello", responseData, successMeta);
         session.sendMessage(new TextMessage(objectMapper.writeValueAsString(handshakeAck)));
