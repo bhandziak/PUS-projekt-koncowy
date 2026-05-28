@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ROUTES } from '../../app/router/routePaths';
-import { useWebSocketLogin } from '../../features/auth/hooks/useLogin';
+import { useLogin } from '../../features/auth/hooks/useLogin';
 
 const LoginPage = () => {
-  const { loginUser, isLoading, error: apiError } = useWebSocketLogin();
+  const { loginUser, isLoading, error: apiError } = useLogin();
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({

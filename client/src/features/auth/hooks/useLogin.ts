@@ -6,7 +6,7 @@ import type { LoginRequest as FormLoginRequest } from '../dto/LoginRequest';
 import type { LoginResponse } from '../dto/LoginResponse';
 import type { ProtocolResponse } from '../../../api/types/ProtocolResponse';
 
-export const useWebSocketLogin = () => {
+export const useLogin = () => {
     const { send } = useWebSocket(false);
     const authContext = useContext(AuthContext);
 
