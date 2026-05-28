@@ -31,7 +31,7 @@ export const useLogin = () => {
 
             if (authContext) {
                 authContext.setAccessToken(authData.access_token);
-                // TODO - setRefreshToken
+                authContext.setRefreshToken(authData.refresh_token);
                 authContext.setUser({
                     id: authData.user_id,
                     username: authData.username,

@@ -15,6 +15,9 @@ const APIs = {
     REGISTER: { 
         type: 'AUTH', action: 'register'
     } as EndpointTemplate,
+    REFRESH_TOKEN: {
+        type: 'AUTH', action: 'refresh_token'
+    } as EndpointTemplate
 }
 
 export default APIs;
