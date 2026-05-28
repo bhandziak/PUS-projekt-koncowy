@@ -68,6 +68,15 @@ public class JwtService {
                 .getPayload()
                 .get("role", String.class);
     }
+
+    public String extractUsername(String token) {
+        return Jwts.parser()
+                .verifyWith(key)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload()
+                .get("username", String.class);
+    }
 }
 
 
