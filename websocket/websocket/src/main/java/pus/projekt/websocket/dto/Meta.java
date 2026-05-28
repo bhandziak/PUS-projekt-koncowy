@@ -6,6 +6,5 @@ import java.util.UUID;
 public record Meta(
         String version,
         UUID packet_id,
-        // TODO nie wiem jaki typ na timestamp chcemy
-        LocalDateTime timestamp
+        Integer timestamp
 ) {}

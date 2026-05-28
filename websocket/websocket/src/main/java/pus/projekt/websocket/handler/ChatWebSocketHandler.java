@@ -5,6 +5,7 @@ import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
+import pus.projekt.websocket.config.TimestampConverter;
 import pus.projekt.websocket.dto.Meta;
 import pus.projekt.websocket.dto.Payload;
 import pus.projekt.websocket.dto.Request;
@@ -14,7 +15,6 @@ import pus.projekt.websocket.enums.Type;
 import tools.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -108,6 +108,6 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
         if (originalMeta != null && originalMeta.packet_id() != null) {
             return originalMeta;
         }
-        return new Meta("1.0.0", UUID.randomUUID(), LocalDateTime.now());
+        return new Meta("1.0.0", UUID.randomUUID(), TimestampConverter.currentToSeconds());
     }
 }
