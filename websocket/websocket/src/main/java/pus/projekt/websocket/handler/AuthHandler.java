@@ -148,7 +148,8 @@ public class AuthHandler implements MessageHandler {
                 "username", user.getUsername(),
                 "access_token", jwtService.generateAccessToken(user),
                 "refresh_token", jwtService.generateRefreshToken(user),
-                "user_id", user.getId().toString()
+                "user_id", user.getId().toString(),
+                "user_role", user.getRole().toString()
         );
         sendSuccess(session, "login", responseData, meta);
     }
