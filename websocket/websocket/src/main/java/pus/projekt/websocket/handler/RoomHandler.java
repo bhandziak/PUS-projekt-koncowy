@@ -69,6 +69,7 @@ public class RoomHandler implements MessageHandler {
                     break;
                 case "create":
                     handleCreate(session, request, token, meta);
+                    break;
                 case "delete":
                 case "join":
                 case "leave":
