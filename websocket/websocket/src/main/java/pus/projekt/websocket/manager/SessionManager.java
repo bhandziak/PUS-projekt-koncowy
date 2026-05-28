@@ -1,14 +1,14 @@
 package pus.projekt.websocket.manager;
 
-import com.zaxxer.hikari.util.ConcurrentBag;
 import org.springframework.stereotype.Component;
+import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import tools.jackson.databind.ObjectMapper;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 @Component
@@ -67,7 +67,41 @@ public class SessionManager {
 
     public void removeRoom(String roomId) {
         roomSubscriptions.remove(roomId);
-
         sessionToRoom.entrySet().removeIf(entry -> entry.getValue().equals(roomId));
+    }
+
+    public void broadcastToRoom(String roomId, Object messageObject) {
+        Set<String> subscribers = roomSubscriptions.get(roomId);
+        if (subscribers == null || subscribers.isEmpty()) return;
+
+        try {
+            String jsonMessage = objectMapper.writeValueAsString(messageObject);
+            TextMessage textMessage = new TextMessage(jsonMessage);
+
+            for (String sessionId : subscribers) {
+                WebSocketSession session = activeSessions.get(sessionId);
+                if (session != null && session.isOpen()) {
+                    session.sendMessage(textMessage);
+                }
+            }
+        } catch (IOException exception) {
+            System.err.println("Błąd podczas rozsyłania do pokoju: " + exception.getMessage());
+        }
+    }
+
+    public void broadcastToAll(Object messageObject) {
+        try {
+            String jsonMessage = objectMapper.writeValueAsString(messageObject);
+            TextMessage textMessage = new TextMessage(jsonMessage);
+
+            for (WebSocketSession session : activeSessions.values()) {
+                if (session.isOpen()) {
+                    session.sendMessage(textMessage);
+                }
+            }
+
+        } catch (IOException exception) {
+            System.err.println("Błąd podczas rozsyłania do pokoju: " + exception.getMessage());
+        }
     }
 }
