@@ -43,9 +43,8 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
         System.out.println("Received message: " + payload);
 
 
-        Request request = null;
         try {
-            request = objectMapper.readValue(payload, Request.class);
+            Request request = objectMapper.readValue(payload, Request.class);
             if (request.type() == null) {
                 sendErrorResponse(
                         session,
@@ -85,14 +84,13 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
             }
         } catch (Exception exception) {
             System.out.println("Bad syntax error: " + exception.getMessage());
-            Meta meta = (request != null) ? request.meta() : null;
             sendErrorResponse(
                     session,
                     Type.ERROR,
                     null,
                     ErrorCode.BAD_SYNTAX,
                     "Invalid JSON format",
-                    fallbackMeta(meta));
+                    fallbackMeta(null));
         }
     }
 
