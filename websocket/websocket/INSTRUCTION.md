@@ -102,3 +102,42 @@ this will start postgres db that is necessary for backend to exist
   }
 }
 `
+
+### room/list
+
+`
+{
+  "type": "ROOM",
+  "payload": {
+    "action": "list",
+    "data": null
+  },
+  "token": "TUTAJ_WKLEJ_SWOJ_ACCESS_TOKEN",
+  "meta": {
+    "version": "1.0.0",
+    "packet_id": "a1b2c3d4-1234-5678-90ab-cdef12345678",
+    "timestamp": 1779963665
+  }
+}
+`
+
+### room/create
+
+`
+{
+  "type": "ROOM",
+  "payload": {
+    "action": "create",
+    "data": {
+      "name": "Programowanie w Springu",
+      "description": "Pokój do dyskusji o backendzie"
+    }
+  },
+  "token": "TUTAJ_WKLEJ_SWOJ_ACCESS_TOKEN_ADMINA",
+  "meta": {
+    "version": "1.0.0",
+    "packet_id": "f5e6d7c8-9012-3456-78ab-cdef90123456",
+    "timestamp": 1779963665
+  }
+}
+`
