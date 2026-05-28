@@ -141,3 +141,79 @@ this will start postgres db that is necessary for backend to exist
   }
 }
 `
+
+### room/delete
+`
+{
+  "type": "ROOM",
+  "payload": {
+    "action": "delete",
+    "data": {
+      "room_id": "TUTAJ_WKLEJ_UUID_POKOJU"
+    }
+  },
+  "token": "TUTAJ_WKLEJ_SWOJ_ACCESS_TOKEN_ADMINA",
+  "meta": {
+    "version": "1.0.0",
+    "packet_id": "b2c3d4e5-2345-6789-01bc-def234567890",
+    "timestamp": 1779963665
+  }
+`
+
+### room/join
+`
+{
+  "type": "ROOM",
+  "payload": {
+    "action": "join",
+    "data": {
+      "room_id": "TUTAJ_WKLEJ_UUID_POKOJU"
+    }
+  },
+  "token": "TUTAJ_WKLEJ_SWOJ_ACCESS_TOKEN",
+  "meta": {
+    "version": "1.0.0",
+    "packet_id": "c3d4e5f6-3456-7890-12cd-ef3456789012",
+    "timestamp": 1779963665
+  }
+}
+`
+
+### room/leave 
+`
+{
+   "type": "ROOM",
+   "payload": {
+      "action": "leave",
+      "data": {
+         "room_id": "TUTAJ_WKLEJ_UUID_POKOJU"
+      }
+   },
+   "token": "TUTAJ_WKLEJ_SWOJ_ACCESS_TOKEN",
+   "meta": {
+      "version": "1.0.0",
+      "packet_id": "d4e5f6a7-4567-8901-23de-f45678901234",
+      "timestamp": 1779963665
+   }
+}
+`
+
+### chat/send
+`
+{
+  "type": "CHAT",
+  "payload": {
+    "action": "send",
+    "data": {
+      "room_id": "TUTAJ_WKLEJ_UUID_POKOJU",
+      "content": "Cześć wszystkim, to moja pierwsza wiadomość na tym kanale!"
+    }
+  },
+  "token": "TUTAJ_WKLEJ_SWOJ_ACCESS_TOKEN",
+  "meta": {
+    "version": "1.0.0",
+    "packet_id": "e5f6a7b8-5678-9012-34ef-567890123456",
+    "timestamp": 1779963665
+  }
+}
+`
