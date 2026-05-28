@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 @Component
 public class SessionManager {
@@ -39,5 +40,34 @@ public class SessionManager {
                 subscribers.remove(sessionId);
             }
         }
+    }
+
+    public void joinRoom(String roomId, WebSocketSession session) {
+        String sessionId = session.getId();
+        String currentRoom = sessionToRoom.get(sessionId);
+        if (currentRoom != null && !currentRoom.equals(roomId)) {
+            leaveRoom(currentRoom, session);
+        }
+        roomSubscriptions.computeIfAbsent(roomId, k -> new CopyOnWriteArraySet<>()).add(sessionId);
+        sessionToRoom.put(sessionId, roomId);
+    }
+
+    public void leaveRoom(String roomId, WebSocketSession session) {
+        String sessionId = session.getId();
+        Set<String> subscibers = roomSubscriptions.get(roomId);
+        if (subscibers != null) {
+            subscibers.remove(sessionId);
+            // Czyszczenie pamięci po ostatnim użytkowniku
+            if (subscibers.isEmpty()) {
+                roomSubscriptions.remove(roomId);
+            }
+        }
+        sessionToRoom.remove(sessionId);
+    }
+
+    public void removeRoom(String roomId) {
+        roomSubscriptions.remove(roomId);
+
+        sessionToRoom.entrySet().removeIf(entry -> entry.getValue().equals(roomId));
     }
 }
