@@ -12,6 +12,7 @@ import pus.projekt.websocket.dto.Request;
 import pus.projekt.websocket.dto.Response;
 import pus.projekt.websocket.enums.ErrorCode;
 import pus.projekt.websocket.enums.Type;
+import pus.projekt.websocket.helpers.VersionValidator;
 import pus.projekt.websocket.manager.SessionManager;
 import tools.jackson.databind.ObjectMapper;
 
@@ -27,12 +28,14 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
     private final ObjectMapper objectMapper;
     private final Map<Type, MessageHandler> handlers;
     private final SessionManager sessionManager;
+    private final VersionValidator versionValidator;
 
-    public ChatWebSocketHandler(ObjectMapper objectMapper, List<MessageHandler> messageHandlers, SessionManager sessionManager) {
+    public ChatWebSocketHandler(ObjectMapper objectMapper, List<MessageHandler> messageHandlers, SessionManager sessionManager, VersionValidator versionValidator) {
         this.objectMapper = objectMapper;
         this.handlers = messageHandlers.stream()
                 .collect(Collectors.toMap(MessageHandler::getSupportedType, Function.identity()));
         this.sessionManager = sessionManager;
+        this.versionValidator = versionValidator;
     }
 
     @Override
@@ -70,6 +73,19 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
                         fallbackMeta(request.meta()));
                 return;
             }
+
+            //validate version
+            if (!versionValidator.isValid(request.meta())) {
+                sendErrorResponse(
+                        session,
+                        request.type(),
+                        request.payload(),
+                        ErrorCode.BAD_VERSION,
+                        "Niepoprawna lub brakująca wersja protokołu. Oczekiwana: " + versionValidator.getSupportedVersion(),
+                        fallbackMeta(request.meta()));
+                return;
+            }
+
             MessageHandler handler = handlers.get(request.type());
             if (handler != null) {
                 System.out.println("handle");
