@@ -11,6 +11,7 @@ import pus.projekt.websocket.dto.PayloadData.LoginResponseData;
 import pus.projekt.websocket.dto.PayloadData.MessageResponseData;
 import pus.projekt.websocket.dto.PayloadData.RefreshTokenResponseData;
 import pus.projekt.websocket.enums.ErrorCode;
+import pus.projekt.websocket.enums.PayloadAction;
 import pus.projekt.websocket.enums.Type;
 import pus.projekt.websocket.model.User;
 import pus.projekt.websocket.repository.UserRepository;
@@ -125,7 +126,7 @@ public class AuthHandler implements MessageHandler {
 
         String encodedPassword = passwordEncoder.encode(authData.password());
         userRepository.save(new User(authData.username(), encodedPassword));
-        sendSuccess(session, "register", responseData, meta);
+        sendSuccess(session, PayloadAction.REGISTER, responseData, meta);
     }
 
     private void handleLogin(WebSocketSession session, Request request, Meta meta) throws IOException {
@@ -162,7 +163,7 @@ public class AuthHandler implements MessageHandler {
             user.getId().toString(),
             user.getRole().toString()
         );
-        sendSuccess(session, "login", responseData, meta);
+        sendSuccess(session, PayloadAction.LOGIN, responseData, meta);
     }
 
     private void handleRefreshToken(WebSocketSession session, Request request, Meta meta) throws IOException {
@@ -213,7 +214,7 @@ public class AuthHandler implements MessageHandler {
                 900 // 15 minut (w sekundach)
         );
 
-        sendSuccess(session, "refresh_token", responseData, meta);
+        sendSuccess(session, PayloadAction.REFRESH_TOKEN, responseData, meta);
     }
 }
 

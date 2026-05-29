@@ -8,6 +8,7 @@ import pus.projekt.websocket.dto.Payload;
 import pus.projekt.websocket.dto.Request;
 import pus.projekt.websocket.dto.Response;
 import pus.projekt.websocket.enums.ErrorCode;
+import pus.projekt.websocket.enums.PayloadAction;
 import pus.projekt.websocket.enums.Type;
 import tools.jackson.databind.ObjectMapper;
 
@@ -19,9 +20,9 @@ public interface MessageHandler {
     ObjectMapper getObjectMapper();
 
     // Default success send
-    default void sendSuccess(WebSocketSession session, String action, Object responseData, Meta meta) throws IOException {
+    default void sendSuccess(WebSocketSession session, PayloadAction action, Object responseData, Meta meta) throws IOException {
         Meta successMeta = new Meta("1.0.0", meta.packet_id(), TimestampConverter.currentToSeconds());
-        Response successResponse = Response.success(getSupportedType(), action, responseData, successMeta);
+        Response successResponse = Response.success(getSupportedType(), action.getValue(), responseData, successMeta);
         session.sendMessage(new TextMessage(getObjectMapper().writeValueAsString(successResponse)));
     }
 

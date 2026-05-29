@@ -7,6 +7,7 @@ import pus.projekt.websocket.config.TimestampConverter;
 import pus.projekt.websocket.dto.*;
 import pus.projekt.websocket.dto.PayloadData.*;
 import pus.projekt.websocket.enums.ErrorCode;
+import pus.projekt.websocket.enums.PayloadAction;
 import pus.projekt.websocket.enums.Status;
 import pus.projekt.websocket.enums.Type;
 import pus.projekt.websocket.manager.SessionManager;
@@ -121,7 +122,7 @@ public class RoomHandler implements MessageHandler {
         RoomsResponseData responseData = new RoomsResponseData(
                 rooms
         );
-        sendSuccess(session, "list", responseData, meta);
+        sendSuccess(session, PayloadAction.LIST, responseData, meta);
     }
 
     private void handleCreate(WebSocketSession session, Request request, String token, Meta meta) throws IOException {
@@ -174,7 +175,7 @@ public class RoomHandler implements MessageHandler {
                 newRoom.getName(),
                 newRoom.getDescription() != null ? newRoom.getDescription() : ""
         );
-        sendSuccess(session, "create", responseData, meta);
+        sendSuccess(session, PayloadAction.CREATE, responseData, meta);
     }
 
     private void handleDelete(WebSocketSession session, Request request, String token, Meta meta) throws IOException {
@@ -203,7 +204,7 @@ public class RoomHandler implements MessageHandler {
             RoomDeleteResponseData responseData = new RoomDeleteResponseData(
                     data.room_id()
             );
-            sendSuccess(session, "delete", responseData, meta);
+            sendSuccess(session, PayloadAction.DELETE, responseData, meta);
 
 
             Map<String, Object> eventData = Map.of(
@@ -264,7 +265,7 @@ public class RoomHandler implements MessageHandler {
                     data.room_id(),
                     "Dołączono do pokoju"
             );
-            sendSuccess(session, "join", responseData, meta);
+            sendSuccess(session, PayloadAction.JOIN, responseData, meta);
 
         } catch (IllegalArgumentException exception) {
             sendError(
@@ -290,6 +291,6 @@ public class RoomHandler implements MessageHandler {
                 "Opuściłeś pokój"
         );
 
-        sendSuccess(session, "leave", responseData, meta);
+        sendSuccess(session, PayloadAction.LEAVE, responseData, meta);
     }
 }

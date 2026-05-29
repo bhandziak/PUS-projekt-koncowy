@@ -7,6 +7,7 @@ import pus.projekt.websocket.config.TimestampConverter;
 import pus.projekt.websocket.dto.*;
 import pus.projekt.websocket.dto.PayloadData.NewMessageRequestData;
 import pus.projekt.websocket.enums.ErrorCode;
+import pus.projekt.websocket.enums.PayloadAction;
 import pus.projekt.websocket.enums.Status;
 import pus.projekt.websocket.enums.Type;
 import pus.projekt.websocket.manager.SessionManager;
@@ -106,7 +107,7 @@ public class ChatHandler implements MessageHandler {
 
         String senderName = jwtService.extractUsername(token);
 
-        sendSuccess(session, "send", null, meta);
+        sendSuccess(session, PayloadAction.SEND, null, meta);
 
         NewMessageRequestData eventData = new NewMessageRequestData(
                 data.room_id(),
