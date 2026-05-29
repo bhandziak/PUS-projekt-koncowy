@@ -1,12 +1,11 @@
 package pus.projekt.websocket.handler;
 
 import lombok.AllArgsConstructor;
-import org.springframework.data.repository.query.ReactiveQueryByExampleExecutor;
 import org.springframework.stereotype.Component;
-import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import pus.projekt.websocket.config.TimestampConverter;
 import pus.projekt.websocket.dto.*;
+import pus.projekt.websocket.dto.PayloadData.NewMessageRequestData;
 import pus.projekt.websocket.enums.ErrorCode;
 import pus.projekt.websocket.enums.Status;
 import pus.projekt.websocket.enums.Type;
@@ -16,7 +15,6 @@ import pus.projekt.websocket.service.JwtService;
 import tools.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
-import java.util.Map;
 import java.util.UUID;
 
 @Component
@@ -30,6 +28,11 @@ public class ChatHandler implements MessageHandler {
     @Override
     public Type getSupportedType() {
         return Type.CHAT;
+    }
+
+    @Override
+    public ObjectMapper getObjectMapper() {
+        return this.objectMapper;
     }
 
     @Override
@@ -105,10 +108,10 @@ public class ChatHandler implements MessageHandler {
 
         sendSuccess(session, "send", null, meta);
 
-        Map<String, Object> eventData = Map.of(
-                "room_id", data.room_id(),
-                "sender_name", senderName,
-                "content", data.content()
+        NewMessageRequestData eventData = new NewMessageRequestData(
+                data.room_id(),
+                senderName,
+                data.content()
         );
 
         Event.MetaEvent metaEvent = new Event.MetaEvent("1.0.0", TimestampConverter.currentToSeconds());
@@ -120,18 +123,6 @@ public class ChatHandler implements MessageHandler {
         );
 
         sessionManager.broadcastToRoom(data.room_id(), broadcastEvent);
-    }
-
-    private void sendSuccess(WebSocketSession session, String action, Map<String, Object> responseData, Meta meta) throws IOException {
-        Meta successMeta = new Meta(meta.version(), meta.packet_id(), TimestampConverter.currentToSeconds());
-        Response successResponse = Response.success(Type.CHAT, action, responseData, successMeta);
-        session.sendMessage(new TextMessage(objectMapper.writeValueAsString(successResponse)));
-    }
-
-    private void sendError(WebSocketSession session, Payload originalPayload, ErrorCode code, String message, Meta meta) throws IOException {
-        Meta errorMeta = new Meta(meta.version(), meta.packet_id(), TimestampConverter.currentToSeconds());
-        Response errorResponse = Response.error(Type.CHAT, originalPayload, code, message, errorMeta);
-        session.sendMessage(new TextMessage(objectMapper.writeValueAsString(errorResponse)));
     }
 }
 

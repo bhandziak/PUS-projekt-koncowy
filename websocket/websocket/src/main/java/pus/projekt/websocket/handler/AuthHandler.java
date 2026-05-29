@@ -4,10 +4,12 @@ package pus.projekt.websocket.handler;
 import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import pus.projekt.websocket.config.TimestampConverter;
 import pus.projekt.websocket.dto.*;
+import pus.projekt.websocket.dto.PayloadData.LoginResponseData;
+import pus.projekt.websocket.dto.PayloadData.MessageResponseData;
+import pus.projekt.websocket.dto.PayloadData.RefreshTokenResponseData;
 import pus.projekt.websocket.enums.ErrorCode;
 import pus.projekt.websocket.enums.Type;
 import pus.projekt.websocket.model.User;
@@ -16,7 +18,6 @@ import pus.projekt.websocket.service.JwtService;
 import tools.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -31,6 +32,11 @@ public class AuthHandler implements MessageHandler {
     @Override
     public Type getSupportedType() {
         return Type.AUTH;
+    }
+
+    @Override
+    public ObjectMapper getObjectMapper() {
+        return this.objectMapper;
     }
 
     @Override
@@ -113,10 +119,13 @@ public class AuthHandler implements MessageHandler {
             return;
         }
 
+        MessageResponseData responseData = new MessageResponseData(
+                "Użytkownik zarejestrowany pomyślnie"
+        );
 
         String encodedPassword = passwordEncoder.encode(authData.password());
         userRepository.save(new User(authData.username(), encodedPassword));
-        sendSuccess(session, "register", Map.of("message", "Użytkownik zarejestrowany pomyślnie"), meta);
+        sendSuccess(session, "register", responseData, meta);
     }
 
     private void handleLogin(WebSocketSession session, Request request, Meta meta) throws IOException {
@@ -146,12 +155,12 @@ public class AuthHandler implements MessageHandler {
         }
 
         User user = userOptional.get();
-        Map<String, Object> responseData = Map.of(
-                "username", user.getUsername(),
-                "access_token", jwtService.generateAccessToken(user),
-                "refresh_token", jwtService.generateRefreshToken(user),
-                "user_id", user.getId().toString(),
-                "user_role", user.getRole().toString()
+        LoginResponseData responseData = new LoginResponseData(
+            user.getUsername(),
+            jwtService.generateAccessToken(user),
+            jwtService.generateRefreshToken(user),
+            user.getId().toString(),
+            user.getRole().toString()
         );
         sendSuccess(session, "login", responseData, meta);
     }
@@ -198,25 +207,13 @@ public class AuthHandler implements MessageHandler {
         }
 
         User user = userOptional.get();
-
-        Map<String, Object> responseData = Map.of(
-                "accessToken", jwtService.generateAccessToken(user),
-                "refreshToken", jwtService.generateRefreshToken(user),
-                "expiresIn", 900 // 15 minut (w sekundach)
+        RefreshTokenResponseData responseData = new RefreshTokenResponseData(
+                jwtService.generateAccessToken(user),
+                jwtService.generateRefreshToken(user),
+                900 // 15 minut (w sekundach)
         );
 
         sendSuccess(session, "refresh_token", responseData, meta);
-    }
-
-    private void sendSuccess(WebSocketSession session, String action, Map<String, Object> responseData, Meta meta) throws IOException {
-        Meta successMeta = new Meta("1.0.0", meta.packet_id(), TimestampConverter.currentToSeconds());
-        Response successResponse = Response.success(Type.AUTH, action, responseData, successMeta);
-        session.sendMessage(new TextMessage(objectMapper.writeValueAsString(successResponse)));
-    }
-
-    private void sendError(WebSocketSession session, Payload originalPayload, ErrorCode code, String message, Meta meta) throws IOException {
-        Response errorResponse = Response.error(Type.AUTH, originalPayload, code, message, meta);
-        session.sendMessage(new TextMessage(objectMapper.writeValueAsString(errorResponse)));
     }
 }
 

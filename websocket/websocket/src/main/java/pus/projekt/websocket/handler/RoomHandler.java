@@ -2,10 +2,10 @@ package pus.projekt.websocket.handler;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
-import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import pus.projekt.websocket.config.TimestampConverter;
 import pus.projekt.websocket.dto.*;
+import pus.projekt.websocket.dto.PayloadData.*;
 import pus.projekt.websocket.enums.ErrorCode;
 import pus.projekt.websocket.enums.Status;
 import pus.projekt.websocket.enums.Type;
@@ -34,6 +34,11 @@ public class RoomHandler implements MessageHandler {
     @Override
     public Type getSupportedType() {
         return Type.ROOM;
+    }
+
+    @Override
+    public ObjectMapper getObjectMapper() {
+        return this.objectMapper;
     }
 
     @Override
@@ -113,7 +118,9 @@ public class RoomHandler implements MessageHandler {
                 ))
                 .collect(Collectors.toList());
 
-        Map<String, Object> responseData = Map.of("rooms", rooms);
+        RoomsResponseData responseData = new RoomsResponseData(
+                rooms
+        );
         sendSuccess(session, "list", responseData, meta);
     }
 
@@ -162,12 +169,11 @@ public class RoomHandler implements MessageHandler {
         Room newRoom = new Room(data.name(), data.description(), UUID.fromString(ownerId), ownerName);
         roomRepository.save(newRoom);
 
-        Map<String, Object> responseData = Map.of(
-                "room_id", newRoom.getId().toString(),
-                "name", newRoom.getName(),
-                "description", newRoom.getDescription() != null ? newRoom.getDescription() : ""
+        CreateRoomResponseData responseData = new CreateRoomResponseData(
+                newRoom.getId().toString(),
+                newRoom.getName(),
+                newRoom.getDescription() != null ? newRoom.getDescription() : ""
         );
-
         sendSuccess(session, "create", responseData, meta);
     }
 
@@ -194,7 +200,9 @@ public class RoomHandler implements MessageHandler {
 
             roomRepository.deleteById(roomId);
             sessionManager.removeRoom(roomId.toString());
-            Map<String, Object> responseData = Map.of("room_id", data.room_id());
+            RoomDeleteResponseData responseData = new RoomDeleteResponseData(
+                    data.room_id()
+            );
             sendSuccess(session, "delete", responseData, meta);
 
 
@@ -252,9 +260,9 @@ public class RoomHandler implements MessageHandler {
 
             sessionManager.joinRoom(roomId.toString(), session);
 
-            Map<String, Object> responseData = Map.of(
-                    "room_id", data.room_id(),
-                    "message", "Dołączono do pokoju"
+            RoomJoinLeaveResponseData responseData = new RoomJoinLeaveResponseData(
+                    data.room_id(),
+                    "Dołączono do pokoju"
             );
             sendSuccess(session, "join", responseData, meta);
 
@@ -277,22 +285,11 @@ public class RoomHandler implements MessageHandler {
             return;
         }
         sessionManager.leaveRoom(data.room_id(), session);
-        Map<String, Object> responseData = Map.of(
-                "room_id", data.room_id(),
-                "message", "Opuściłeś pokój"
+        RoomJoinLeaveResponseData responseData = new RoomJoinLeaveResponseData(
+                data.room_id(),
+                "Opuściłeś pokój"
         );
+
         sendSuccess(session, "leave", responseData, meta);
-    }
-
-    private void sendSuccess(WebSocketSession session, String action, Map<String, Object> responseData, Meta meta) throws IOException {
-        Meta successMeta = new Meta(meta.version(), meta.packet_id(), TimestampConverter.currentToSeconds());
-        Response successResponse = Response.success(Type.ROOM, action, responseData, successMeta);
-        session.sendMessage(new TextMessage(objectMapper.writeValueAsString(successResponse)));
-    }
-
-    private void sendError(WebSocketSession session, Payload originalPayload, ErrorCode code, String message, Meta meta) throws IOException {
-        Meta errorMeta = new Meta(meta.version(), meta.packet_id(), TimestampConverter.currentToSeconds());
-        Response errorResponse = Response.error(Type.ROOM, originalPayload, code, message, errorMeta);
-        session.sendMessage(new TextMessage(objectMapper.writeValueAsString(errorResponse)));
     }
 }
