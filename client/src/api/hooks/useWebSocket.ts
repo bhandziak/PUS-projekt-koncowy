@@ -4,6 +4,7 @@ import { createWebSocketPacket } from '../utils/packetBuilder';
 import type { EndpointTemplate } from '../types/websocket';
 import { socket, registerPendingRequest } from '../websocket/client';
 import { useRefreshToken } from '../../features/auth/hooks/useRefreshToken';
+import { wsLogger } from '../../features/shared/utils/wsLogger';
 
 export const useWebSocket = (isAuth: boolean = true) => {
     const authContext = useContext(AuthContext);
@@ -63,7 +64,7 @@ export const useWebSocket = (isAuth: boolean = true) => {
             
             // 2. Send packet to the server
             socket.send(JSON.stringify(packet));
-            console.log('WebSocket: Sent packet to server:', packet);
+            wsLogger.send(endpoint.action, packet);
         } else {
             console.warn("WebSocket: Brak aktywnego połączenia!");
             reject(new Error("Brak połączenia z serwerem"));

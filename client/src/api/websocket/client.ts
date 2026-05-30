@@ -1,3 +1,4 @@
+import { wsLogger } from '../../features/shared/utils/wsLogger';
 import APIs from '../ApiURL';
 
 /*
@@ -32,9 +33,14 @@ socket.onmessage = (event) => {
                 handlers.resolve(responseData);
                 pendingRequests.delete(packetId);
             }
-            console.log('WebSocket: Received response for packet_id', packetId, responseData);
+            
+            if (responseData.status === 'OK') {
+                wsLogger.receiveSuccess(responseData.meta.endpoint, packetId, responseData);
+            } else {
+                wsLogger.receiveFail(responseData.meta.endpoint, packetId, responseData);
+            }
         } else {
-            console.log('Broadcast or unassociated packet_id:', responseData);
+            wsLogger.broadcast(responseData.type, responseData);
             // Handle broadcast messages
             if (responseData.type) {
                 const listeners = broadcastListeners.get(responseData.type);
@@ -44,7 +50,7 @@ socket.onmessage = (event) => {
             }
         }
     } catch (e) {
-        console.error('WebSocket: Error parsing message:', event.data, e);
+        wsLogger.receiveFail('WebSocket: Error parsing message:', event.data, e);
     }
 };
 

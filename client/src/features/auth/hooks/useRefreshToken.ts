@@ -3,6 +3,7 @@ import { AuthContext } from '../../../app/providers/AuthProvider';
 import { createWebSocketPacket } from '../../../api/utils/packetBuilder';
 import { socket, registerPendingRequest } from '../../../api/websocket/client';
 import APIs from '../../../api/ApiURL';
+import { wsLogger } from '../../shared/utils/wsLogger';
 
 let refreshInProgressPromise: Promise<string> | null = null;
 
@@ -52,7 +53,7 @@ export const useRefreshToken = () => {
         });
 
         socket.send(JSON.stringify(refreshPacket));
-        console.log("WebSocket: Sent refresh token request.", refreshPacket);
+        wsLogger.sendRefresh(refreshPacket);
       } else {
         reject(new Error("WebSocket jest zamknięty. Nie można odświeżyć sesji."));
       }
