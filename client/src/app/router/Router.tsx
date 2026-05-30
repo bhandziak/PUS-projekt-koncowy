@@ -3,6 +3,7 @@ import PublicRoutes from "./PublicRoutes";
 import PrivateRoutes from "./PrivateRoutes";
 import AuthProvider from "../providers/AuthProvider";
 import RoomProvider from "../providers/RoomProvider";
+import ChatProvider from "../providers/ChatProvider";
 import { Outlet } from "react-router-dom";
 
 const Router = () => {
@@ -13,8 +14,11 @@ const Router = () => {
               {PublicRoutes()}
               <Route element={
                 <RoomProvider>
+                  <ChatProvider>
                   <Outlet />
-                </RoomProvider>}>
+                  </ChatProvider>
+                </RoomProvider>
+                }>
                 {PrivateRoutes()}
             </Route>
           </Routes>

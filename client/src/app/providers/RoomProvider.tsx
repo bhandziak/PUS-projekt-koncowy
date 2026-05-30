@@ -2,6 +2,7 @@ import React, { createContext, useState, useCallback, useEffect } from 'react';
 import { subscribeToBroadcast } from '../../api/websocket/client';
 import { useRoom } from '../../features/room/hooks/useRoom';
 import type { RoomResponse } from '../../features/room/dto/RoomResponse';
+import APIs from '../../api/ApiURL';
 
 export interface RoomContextType {
     rooms: RoomResponse[];
@@ -32,15 +33,16 @@ const RoomProvider = ({ children }: { children: React.ReactNode }) => {
 
     // Broadcast listener for ROOM events
     useEffect(() => {
-        const unsubscribe = subscribeToBroadcast('ROOM', (eventData) => {
+        const unsubscribe = subscribeToBroadcast(APIs.ON_ROOM_UPDATE.type, (eventData) => {
             const { payload } = eventData;
             
-            if (payload?.action === 'list_updated') {
+            if (payload?.action === APIs.ON_ROOM_UPDATE.action) {
                 const { change_type, room_id, name, description } = payload.data;
 
 
                 if (change_type === 'created') {
-                    // add new room 
+                    // add new room
+                    // TODO: test it 
                     setRooms(prevRooms => {
                         if (prevRooms.some(r => r.room_id === room_id)) return prevRooms;
                         return [...prevRooms, { room_id, name, description }];

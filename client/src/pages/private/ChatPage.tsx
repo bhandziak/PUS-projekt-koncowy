@@ -7,19 +7,33 @@ import RoomStatus from '../../features/room/components/RoomStatus';
 import { ROUTES } from '../../app/router/routePaths';
 import { RoomContext } from '../../app/providers/RoomProvider';
 import { AuthContext } from '../../app/providers/AuthProvider';
+import { ChatContext } from '../../app/providers/ChatProvider';
+
 import { useRoom } from '../../features/room/hooks/useRoom';
 import { useRoomInteraction } from '../../features/room/hooks/useRoomInteraction';
+import { useChat } from '../../features/chat/hooks/useChat';
 
 const ChatPage = () => {
+    // USER CONTEXT
     const authContext = useContext(AuthContext);
     const user_role = authContext?.user?.role || 'USER';
 
+    // ROOM CONTEXT
     const roomContext = useContext(RoomContext);
     if (!roomContext) return null;
     const { rooms, setRooms } = roomContext;
 
+    // CHAT CONTEXT
+    const chatContext = useContext(ChatContext);
+    if (!chatContext) return null;
+    const { messages, clearMessages } = chatContext;
+
+    // HOOKS
     const { deleteRoom, isLoading: isDeleting, error: deleteError } = useRoom();
     const { joinRoom, leaveRoom, isLoading: isInteracting, error: interactionError, isSuccess: isSuccessfulInteraction } = useRoomInteraction();
+    const { sendMessage, isSending, sendError } = useChat();
+
+    const [input, setInput] = useState('');
 
     const [activeRoomId, setActiveRoomId] = useState<string | null>(null);
     const activeRoom = rooms.find(r => r.room_id === activeRoomId);
@@ -44,6 +58,7 @@ const ChatPage = () => {
 
         setActiveRoomId(id);
         joinRoom({ room_id: id });
+        clearMessages();
     }
 
     const handleLeaveRoom = () => {
@@ -51,7 +66,24 @@ const ChatPage = () => {
 
         leaveRoom({ room_id: activeRoomId });
         setActiveRoomId(null);
+        clearMessages();
     };
+
+    const handleSendMessage = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!activeRoomId) return;
+        if (!input.trim()) return;
+
+        const success = await sendMessage({
+            room_id: activeRoomId,
+            content: input.trim()
+        });
+
+        if (success) {
+            setInput('');
+        }
+    }
+
 
     return (
         <div className="cyber-chat-container"> 
@@ -136,28 +168,40 @@ const ChatPage = () => {
 
                     </div>
 
-                    <div className="cyber-chat-body cyber-scrollbar">
-                        {/* {MOCK_MESSAGES.map(msg => (
+                    <div className="flex-1 overflow-y-auto p-6 space-y-6 cyber-scrollbar">
+                        {messages.map(msg => (
                             <MessageItem 
-                                key={msg.id}
+                                key={msg.message_id}
                                 author={msg.author}
-                                timestamp={msg.timestamp}
+                                timestamp={new Date(msg.timestamp * 1000).toLocaleTimeString()}
                                 content={msg.content}
                             />
-                        ))} */}
+                        ))}
                     </div>
 
                     <div className="cyber-chat-footer">
-                        <form className="cyber-chat-form" onSubmit={(e) => e.preventDefault()}>
+                        <form onSubmit={handleSendMessage} className="p-4 border-t border-zinc-800">
+                        {sendError && (
+                            <div className="text-red-500 text-xs mb-2">[ERR] {sendError}</div>
+                        )}
+                        <div className="flex gap-2">
                             <input 
                                 type="text" 
-                                placeholder="Wprowadź polecenie lub wiadomość..." 
-                                className="dark-auth-input flex-1 !font-mono text-sm placeholder:text-zinc-700 focus:!border-sky-500/50"
+                                value={input}
+                                onChange={e => setInput(e.target.value)}
+                                disabled={isSending}
+                                className="dark-auth-input flex-1"
+                                placeholder="Wprowadź polecenie..."
                             />
-                            <button type="submit" className="dark-auth-btn-primary !w-auto px-8 uppercase tracking-widest text-xs">
-                                Wyślij
+                            <button 
+                                type="submit" 
+                                disabled={isSending}
+                                className="dark-auth-btn-primary !w-auto !px-6"
+                            >
+                                {isSending ? 'Wysyłanie...' : 'Wyślij'}
                             </button>
-                        </form>
+                        </div>
+                    </form>
                     </div>
                     
                 </div>
