@@ -18,7 +18,7 @@ const ForbiddenPage = () => {
         
         <div className="pt-4 w-full">
           <Link
-            to={ROUTES.HOME}
+            to={ROUTES.CHAT}
             className="dark-auth-btn-primary inline-block text-center"
           >
             Wróć do aplikacji

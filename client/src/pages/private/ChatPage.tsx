@@ -4,15 +4,37 @@ import RoomItem from '../../features/room/components/RoomItem';
 import MessageItem from '../../features/chat/components/MessageItem';
 import { ROUTES } from '../../app/router/routePaths';
 import { RoomContext } from '../../app/providers/RoomProvider';
+import { AuthContext } from '../../app/providers/AuthProvider';
+import { useRoom } from '../../features/room/hooks/useRoom';
 
 const ChatPage = () => {
+    const authContext = useContext(AuthContext);
+    const user_role = authContext?.user?.role || 'USER';
+
     const roomContext = useContext(RoomContext);
     if (!roomContext) return null;
-    const { rooms } = roomContext;
+    const { rooms, setRooms } = roomContext;
 
-    const [activeRoomId, setActiveRoomId] = useState<string>('1');
+    const [activeRoomId, setActiveRoomId] = useState<string | null>(null);
+
+    const { deleteRoom, isLoading: isDeleting, error: deleteError } = useRoom();
 
     const activeRoom = rooms.find(r => r.room_id === activeRoomId);
+
+    const handleDeleteRoom = async () => {
+        if (!activeRoomId) return;
+
+        const confirmed = window.confirm(`Czy na pewno chcesz bezpowrotnie usunąć węzeł #${activeRoom?.name}?`);
+        if (!confirmed) return;
+
+        const success = await deleteRoom({ room_id: activeRoomId });
+        
+        // TODO: remove this code after implementing real-time room list updates via WebSocket
+        if (success) {
+            setRooms(prevRooms => prevRooms.filter(room => room.room_id !== activeRoomId));
+            setActiveRoomId(null);
+        }
+    };
 
     return (
         <div className="cyber-chat-container"> 
@@ -21,9 +43,13 @@ const ChatPage = () => {
                 <div className="cyber-rooms-sidebar">
                     <div className="cyber-rooms-header">
                         <h2 className="dark-auth-label !text-base mb-4 tracking-wider">LISTA POKOI</h2>
-                        <Link to={ROUTES.CREATE_ROOM} className="dark-auth-btn-primary gap-2"> 
-                            <span className="text-lg leading-none">+</span> Dodaj pokój
-                        </Link>
+                        {
+                            user_role === 'ADMIN' && (
+                                <Link to={ROUTES.CREATE_ROOM} className="dark-auth-btn-primary gap-2"> 
+                                    <span className="text-lg leading-none">+</span> Dodaj pokój
+                                </Link>
+                            )
+                        }
                     </div>
                     
                     <div className="cyber-rooms-list cyber-scrollbar">
@@ -69,14 +95,22 @@ const ChatPage = () => {
                             <span className="dark-status-success mt-1">Połączono</span>
                         </div>
                         
-                        <div className="cyber-chat-header-actions">
-                            <button className="dark-auth-btn-secondary !py-2 !w-auto text-xs uppercase tracking-wider">
-                                Opuść pokój
-                            </button>
-                            <button className="dark-auth-btn-secondary !py-2 !w-auto text-xs uppercase tracking-wider !border-red-900/50 !text-red-400 hover:!bg-red-950/30 hover:!text-red-300 hover:!border-red-800">
-                                Usuń pokój
-                            </button>
-                        </div>
+                        {
+                            activeRoomId && (
+                                <div className="cyber-chat-header-actions">
+                                    <button className="dark-auth-btn-secondary !py-2 !w-auto text-xs uppercase tracking-wider">
+                                        Opuść pokój
+                                    </button>
+                                    {user_role === 'ADMIN' && (
+                                        <button className="dark-auth-btn-secondary !py-2 !w-auto text-xs uppercase tracking-wider !border-red-900/50 !text-red-400 hover:!bg-red-950/30 hover:!text-red-300 hover:!border-red-800"
+                                        onClick={handleDeleteRoom}>
+                                            Usuń pokój
+                                        </button>
+                                    )}
+                                </div>
+                            )
+                        }
+
                     </div>
 
                     <div className="cyber-chat-body cyber-scrollbar">

@@ -4,6 +4,7 @@ import type { CreateRoomRequest } from '../dto/CreateRoomRequest';
 import type { CreateRoomResponse } from '../dto/CreateRoomResponse';
 import APIs from '../../../api/ApiURL';
 import type { ListRoomResponse } from '../dto/ListRoomResponse';
+import type { DeleteRoomRequest } from '../dto/DeleteRoomRequest';
 
 export const useRoom = () => {
     const { send } = useWebSocket(true); 
@@ -52,5 +53,26 @@ export const useRoom = () => {
             setIsLoading(false);
         }
     }, [send]);
-    return { createRoom, getAll, isLoading, error, isSuccess };
+
+    const deleteRoom = useCallback(async (data: DeleteRoomRequest) => {
+        setIsLoading(true);
+        setError(null);
+        setIsSuccess(false);
+
+        try {
+            await send<DeleteRoomRequest, any>(APIs.DELETE_ROOM, data);
+            setIsSuccess(true);
+            return true;
+        } catch (errPacket: any) {
+            const backendMessage = 
+                errPacket?.error?.message || 
+                "Nie udało się usunąć pokoju. Spróbuj ponownie.";
+            
+            setError(backendMessage);
+            return false;
+        } finally {
+            setIsLoading(false);
+        }
+    }, [send]);
+    return { createRoom, getAll, deleteRoom, isLoading, error, isSuccess };
 };
