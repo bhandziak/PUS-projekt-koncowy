@@ -1,0 +1,169 @@
+
+@import "tailwindcss";
+
+.cyber-chat-container {
+  @apply flex-1 h-full min-h-0 bg-zinc-950 text-zinc-100 p-4 sm:p-6 flex flex-col;
+}
+
+.cyber-chat-wrapper {
+  @apply w-full max-w-7xl mx-auto flex gap-6 flex-1 min-h-0;
+}
+
+.cyber-rooms-sidebar {
+  @apply w-80 flex flex-col gap-4 h-full shrink-0;
+}
+
+.cyber-rooms-header {
+  @apply bg-zinc-900 p-5 rounded-2xl border border-zinc-800 shadow-xl shadow-sky-950/10;
+}
+
+.cyber-rooms-list {
+  @apply bg-zinc-900 p-3 rounded-2xl border border-zinc-800 flex-1 overflow-y-auto space-y-2 shadow-inner shadow-zinc-950/50;
+}
+
+.cyber-chat-main {
+  @apply flex-1 bg-zinc-900 rounded-2xl border border-zinc-800 shadow-2xl shadow-sky-950/20 flex flex-col min-h-0 min-w-0 relative;
+}
+
+.cyber-chat-header {
+  @apply px-6 py-4 border-b border-zinc-800 bg-zinc-950/30 flex justify-between items-center shrink-0 z-10 backdrop-blur-sm;
+}
+
+.cyber-chat-title-wrapper {
+  @apply flex items-center gap-4;
+}
+
+.cyber-chat-title {
+  @apply text-xl font-bold text-zinc-100 flex items-center gap-2;
+}
+
+.cyber-chat-header-actions {
+  @apply flex gap-3;
+}
+
+.cyber-chat-body {
+  @apply flex-1 overflow-y-auto p-6 space-y-6 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-zinc-900 via-zinc-900 to-zinc-950;
+}
+
+.cyber-chat-footer {
+  @apply p-4 bg-zinc-950/80 border-t border-zinc-800 shrink-0 z-10 backdrop-blur-md;
+}
+
+.cyber-chat-form {
+  @apply flex gap-3 max-w-5xl mx-auto;
+}
+
+.cyber-room-item {
+  @apply w-full text-left p-4 rounded-xl border transition-all duration-300 flex items-center justify-between bg-zinc-900 border-zinc-800 min-w-0; /* Dodano min-w-0 */
+
+  &:hover {
+    @apply border-zinc-700 bg-zinc-800/60;
+
+    .cyber-room-text {
+      @apply text-zinc-200;
+    }
+  }
+
+  &.active {
+    @apply bg-zinc-800 border-sky-400 shadow-[0_0_15px_rgba(56,189,248,0.15)];
+  }
+}
+
+.cyber-room-text {
+  @apply font-medium tracking-wide text-zinc-400 transition-colors duration-300 truncate block pr-2;
+
+  &.active {
+    @apply text-sky-400;
+  }
+}
+
+.cyber-room-indicator-wrapper {
+  @apply relative flex h-2 w-2;
+}
+
+.cyber-room-indicator-ping {
+  @apply animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75;
+}
+
+.cyber-room-indicator-dot {
+  @apply relative inline-flex rounded-full h-2 w-2 bg-sky-500;
+}
+
+.cyber-message-item {
+  @apply flex flex-col gap-1.5 min-w-0;
+}
+
+.cyber-message-meta {
+  @apply flex items-baseline gap-3;
+}
+
+.cyber-message-author {
+  @apply font-bold text-sm text-sky-400 drop-shadow-[0_0_8px_rgba(56,189,248,0.4)];
+
+  &.system {
+    @apply text-zinc-400 drop-shadow-none;
+  }
+}
+
+.cyber-message-timestamp {
+  @apply text-[11px] text-zinc-600 font-mono;
+}
+
+.cyber-message-bubble {
+  @apply text-sm py-2.5 px-4 rounded-xl border block max-w-[85%] font-sans leading-relaxed text-zinc-300 bg-zinc-950/60 border-zinc-800/80 break-words whitespace-pre-wrap;
+
+  &.system {
+    @apply text-zinc-400 bg-zinc-900/40 border-zinc-800/50;
+  }
+}
+
+.cyber-scrollbar::-webkit-scrollbar-button,
+.cyber-scrollbar::-webkit-scrollbar-button:vertical,
+.cyber-scrollbar::-webkit-scrollbar-button:horizontal,
+.cyber-scrollbar::-webkit-scrollbar-button:start:decrement,
+.cyber-scrollbar::-webkit-scrollbar-button:end:increment {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+.cyber-scrollbar::-webkit-scrollbar-button {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+.cyber-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.cyber-scrollbar::-webkit-scrollbar-track {
+  background: #18181b;
+  border-radius: 8px;
+}
+
+.cyber-scrollbar::-webkit-scrollbar-thumb {
+  background: #0284c7;
+  border-radius: 8px;
+
+  &:hover {
+    background: #0ea5e9;
+  }
+}
+
+.cyber-room-description {
+  @apply text-xs text-zinc-500 font-sans tracking-normal mt-0.5 block truncate transition-colors duration-300;
+}
+
+.cyber-room-item:hover .cyber-room-description {
+  @apply text-zinc-400;
+}
+
+.cyber-room-description.active {
+  @apply text-sky-500/70;
+}
+
+.cyber-chat-description {
+  @apply text-xs text-zinc-500 font-mono tracking-wide max-w-xs md:max-w-md truncate block;
+}
