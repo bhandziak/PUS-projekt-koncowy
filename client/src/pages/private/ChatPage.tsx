@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import RoomItem from '../../features/room/components/RoomItem';
 import MessageItem from '../../features/chat/components/MessageItem';
+import { ROUTES } from '../../app/router/routePaths';
 
 
 // --- MOCK DATA ---
@@ -29,9 +31,9 @@ const ChatPage = () => {
                 <div className="cyber-rooms-sidebar">
                     <div className="cyber-rooms-header">
                         <h2 className="dark-auth-label !text-base mb-4 tracking-wider">LISTA POKOI</h2>
-                        <button className="dark-auth-btn-primary gap-2">
+                        <Link to={ROUTES.CREATE_ROOM} className="dark-auth-btn-primary gap-2"> 
                             <span className="text-lg leading-none">+</span> Dodaj pokój
-                        </button>
+                        </Link>
                     </div>
                     
                     <div className="cyber-rooms-list cyber-scrollbar">

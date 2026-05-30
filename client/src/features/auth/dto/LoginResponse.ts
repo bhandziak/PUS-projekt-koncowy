@@ -3,6 +3,5 @@ export interface LoginResponse {
     username: string;
     access_token: string;
     refresh_token: string;
-    // TODO - role
-    // role: string;
+    user_role: string;
 }

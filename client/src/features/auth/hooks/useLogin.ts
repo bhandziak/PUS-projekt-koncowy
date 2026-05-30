@@ -35,7 +35,7 @@ export const useLogin = () => {
                 authContext.setUser({
                     id: authData.user_id,
                     username: authData.username,
-                    role: "USER", // TODO - backend musi zwracać rolę użytkownika
+                    role: authData.user_role,
                 });
             }
 

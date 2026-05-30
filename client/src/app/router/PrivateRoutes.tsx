@@ -4,7 +4,7 @@ import RequireAuth from "../../features/auth/context/RequireAuth";
 import { ROUTES } from "./routePaths";
 import PrivateLayout from "../../features/shared/components/PrivateLayout";
 import ChatPage from "../../pages/private/ChatPage";
-
+import CreateRoomPage from "../../pages/private/CreateRoomPage";
 
 const PrivateRoutes = () => {
     return (
@@ -17,6 +17,7 @@ const PrivateRoutes = () => {
                 </Route>
                 <Route element={<RequireAuth allowedRoles={['ADMIN']} />}>
                     <Route element={<PrivateLayout />}>
+                        <Route path={ROUTES.CREATE_ROOM} element={<CreateRoomPage />} />
                     </Route>
                 </Route> 
             </Route>
