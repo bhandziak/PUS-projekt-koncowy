@@ -22,38 +22,45 @@ export const useWebSocket = (isAuth: boolean = true) => {
         if (socket && socket.readyState === WebSocket.OPEN) {
 
             // 1. Register packet with pending requests to handle the response later
-            registerPendingRequest(packetId, async (response) => {
-                if (response.status === 'OK') {
-                    resolve(response);
-                } else {
-                    // Token expiration handling
-                    const isTokenExpired = response.error?.code === 'TOKEN_EXPIRED'
-
-                    if (isTokenExpired && refreshToken) {
-                        try {
-                            const newAccessToken = await refresh();
-
-                            const retryPacket = createWebSocketPacket(endpoint, data, newAccessToken);
-                            
-                            registerPendingRequest(retryPacket.meta.packet_id, (retryResponse) => {
-                                if (retryResponse.status === 'OK') {
-                                    resolve(retryResponse);
-                                } else {
-                                    reject(retryResponse);
-                                }
-                            });
-
-                            socket.send(JSON.stringify(retryPacket));
-                        } catch (refreshError) {
-                            // refresh token failed
-                            reject(refreshError);
-                        }
+            registerPendingRequest(packetId, {
+                resolve: async (response) => {
+                    if (response.status === 'OK') {
+                        resolve(response);
                     } else {
-                        // other errors (not token expiration)
-                        reject(response);
+                        // Token expiration handling
+                        const isTokenExpired = response.error?.code === 'TOKEN_EXPIRED';
+
+                        if (isTokenExpired && refreshToken) {
+                            try {
+                                const newAccessToken = await refresh();
+
+                                const retryPacket = createWebSocketPacket(endpoint, data, newAccessToken);
+                                
+                                registerPendingRequest(retryPacket.meta.packet_id, {
+                                    resolve: (retryResponse) => {
+                                        if (retryResponse.status === 'OK') {
+                                            resolve(retryResponse);
+                                        } else {
+                                            reject(retryResponse);
+                                        }
+                                    },
+                                    reject // pass error to the original caller if retry also fails
+                                });
+
+                                socket.send(JSON.stringify(retryPacket));
+                            } catch (refreshError) {
+                                // refresh token failed
+                                reject(refreshError);
+                            }
+                        } else {
+                            // other errors (not token expiration)
+                            reject(response);
+                        }
                     }
-                }
+                },
+                reject // pass error to the original caller if retry also fails
             });
+            
             // 2. Send packet to the server
             socket.send(JSON.stringify(packet));
             console.log('WebSocket: Sent packet to server:', packet);

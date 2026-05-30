@@ -69,7 +69,7 @@ const ChatPage = () => {
         clearMessages();
     };
 
-    const handleSendMessage = async (e: React.FormEvent) => {
+    const handleSendMessage = async (e: React.SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (!activeRoomId) return;
         if (!input.trim()) return;
@@ -189,13 +189,13 @@ const ChatPage = () => {
                                 type="text" 
                                 value={input}
                                 onChange={e => setInput(e.target.value)}
-                                disabled={isSending}
+                                disabled={isSending || !activeRoomId}
                                 className="dark-auth-input flex-1"
                                 placeholder="Wprowadź polecenie..."
                             />
                             <button 
                                 type="submit" 
-                                disabled={isSending}
+                                disabled={isSending || !activeRoomId}
                                 className="dark-auth-btn-primary !w-auto !px-6"
                             >
                                 {isSending ? 'Wysyłanie...' : 'Wyślij'}
