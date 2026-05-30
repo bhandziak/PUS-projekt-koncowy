@@ -2,10 +2,13 @@ import React, { useState, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import RoomItem from '../../features/room/components/RoomItem';
 import MessageItem from '../../features/chat/components/MessageItem';
+import RoomStatus from '../../features/room/components/RoomStatus';
+
 import { ROUTES } from '../../app/router/routePaths';
 import { RoomContext } from '../../app/providers/RoomProvider';
 import { AuthContext } from '../../app/providers/AuthProvider';
 import { useRoom } from '../../features/room/hooks/useRoom';
+import { useRoomInteraction } from '../../features/room/hooks/useRoomInteraction';
 
 const ChatPage = () => {
     const authContext = useContext(AuthContext);
@@ -15,10 +18,10 @@ const ChatPage = () => {
     if (!roomContext) return null;
     const { rooms, setRooms } = roomContext;
 
-    const [activeRoomId, setActiveRoomId] = useState<string | null>(null);
-
     const { deleteRoom, isLoading: isDeleting, error: deleteError } = useRoom();
+    const { joinRoom, leaveRoom, isLoading: isInteracting, error: interactionError, isSuccess: isSuccessfulInteraction } = useRoomInteraction();
 
+    const [activeRoomId, setActiveRoomId] = useState<string | null>(null);
     const activeRoom = rooms.find(r => r.room_id === activeRoomId);
 
     const handleDeleteRoom = async () => {
@@ -34,6 +37,20 @@ const ChatPage = () => {
                 setActiveRoomId(null);
             }
         }
+    };
+
+    const handleRoomClick = (id: string) => {
+        if (id === activeRoomId) return;
+
+        setActiveRoomId(id);
+        joinRoom({ room_id: id });
+    }
+
+    const handleLeaveRoom = () => {
+        if (!activeRoomId) return;
+
+        leaveRoom({ room_id: activeRoomId });
+        setActiveRoomId(null);
     };
 
     return (
@@ -67,7 +84,7 @@ const ChatPage = () => {
                                 name={room.name}
                                 description={room.description}
                                 isActive={activeRoomId === room.room_id}
-                                onClick={setActiveRoomId}
+                                onClick={handleRoomClick}
                             />
                         ))
                     )}
@@ -92,13 +109,19 @@ const ChatPage = () => {
                                 )}
                             </div>
                             
-                            <span className="dark-status-success mt-1">Połączono</span>
+                            <RoomStatus 
+                                activeRoomId={activeRoomId}
+                                isInteracting={isInteracting || isDeleting}
+                                interactionError={interactionError || deleteError}
+                            />
                         </div>
                         
                         {
                             activeRoomId && (
                                 <div className="cyber-chat-header-actions">
-                                    <button className="dark-auth-btn-secondary !py-2 !w-auto text-xs uppercase tracking-wider">
+                                    <button 
+                                    className="dark-auth-btn-secondary !py-2 !w-auto text-xs uppercase tracking-wider"
+                                    onClick={handleLeaveRoom}>
                                         Opuść pokój
                                     </button>
                                     {user_role === 'ADMIN' && (
