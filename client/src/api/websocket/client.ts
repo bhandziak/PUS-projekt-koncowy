@@ -4,7 +4,10 @@ import APIs from '../ApiURL';
  */
 
 type WebSocketResolver = (response: any) => void;
+type BroadcastListener = (payload: any) => void;
+
 const pendingRequests = new Map<string, WebSocketResolver>();
+const broadcastListeners = new Map<string, Set<BroadcastListener>>();
 
 export const socket = new WebSocket(APIs.SERVER_URL);
 
@@ -27,6 +30,13 @@ socket.onmessage = (event) => {
             console.log('WebSocket: Received response for packet_id', packetId, responseData);
         } else {
             console.log('Broadcast or unassociated packet_id:', responseData);
+            // Handle broadcast messages
+            if (responseData.type) {
+                const listeners = broadcastListeners.get(responseData.type);
+                if (listeners) {
+                    listeners.forEach(listener => listener(responseData));
+                }
+            }
         }
     } catch (e) {
         console.error('WebSocket: Error parsing message:', event.data, e);
@@ -36,7 +46,7 @@ socket.onmessage = (event) => {
 socket.onerror = (error) => console.error('WebSocket: Error:', error);
 socket.onclose = () => console.warn('WebSocket: Connection closed.');
 
-
+// TODO - add reconnection logic / throw error to hooks
 export const registerPendingRequest = (packetId: string, resolver: WebSocketResolver) => {
     pendingRequests.set(packetId, resolver);
 
@@ -47,4 +57,18 @@ export const registerPendingRequest = (packetId: string, resolver: WebSocketReso
             pendingRequests.delete(packetId);
         }
     }, 10000);
+};
+
+
+export const subscribeToBroadcast = (type: string, callback: BroadcastListener) => {
+    // Add subscriber callback
+    if (!broadcastListeners.has(type)) {
+        broadcastListeners.set(type, new Set());
+    }
+    broadcastListeners.get(type)!.add(callback);
+
+    // Clean subscriber callback on unmount
+    return () => {
+        broadcastListeners.get(type)?.delete(callback);
+    };
 };

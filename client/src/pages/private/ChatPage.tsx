@@ -29,10 +29,10 @@ const ChatPage = () => {
 
         const success = await deleteRoom({ room_id: activeRoomId });
         
-        // TODO: remove this code after implementing real-time room list updates via WebSocket
         if (success) {
-            setRooms(prevRooms => prevRooms.filter(room => room.room_id !== activeRoomId));
-            setActiveRoomId(null);
+            if (activeRoomId === activeRoom?.room_id) {
+                setActiveRoomId(null);
+            }
         }
     };
 
