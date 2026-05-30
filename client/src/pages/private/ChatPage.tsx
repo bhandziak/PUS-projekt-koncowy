@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import RoomItem from '../../features/room/components/RoomItem';
 import MessageItem from '../../features/chat/components/MessageItem';
@@ -83,6 +83,14 @@ const ChatPage = () => {
             setInput('');
         }
     }
+
+    useEffect(() => {
+        if (activeRoomId && !rooms.some(r => r.room_id === activeRoomId)) {
+            setActiveRoomId(null);
+            clearMessages();
+            alert("Pokój został usunięty przez administratora.")
+        }
+    }, [rooms, activeRoomId, clearMessages]);
 
 
     return (
@@ -191,7 +199,7 @@ const ChatPage = () => {
                                 onChange={e => setInput(e.target.value)}
                                 disabled={isSending || !activeRoomId}
                                 className="dark-auth-input flex-1"
-                                placeholder="Wprowadź polecenie..."
+                                placeholder="Napisz wiadomość..."
                             />
                             <button 
                                 type="submit" 
