@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useWebSocket } from '../../../api/hooks/useWebSocket';
 import type { CreateRoomRequest } from '../dto/CreateRoomRequest';
 import type { CreateRoomResponse } from '../dto/CreateRoomResponse';
 import APIs from '../../../api/ApiURL';
+import type { ListRoomResponse } from '../dto/ListRoomResponse';
 
 export const useRoom = () => {
     const { send } = useWebSocket(true); 
@@ -11,7 +12,7 @@ export const useRoom = () => {
     const [error, setError] = useState<string | null>(null);
     const [isSuccess, setIsSuccess] = useState<boolean>(false);
 
-    const createRoom = async (data: CreateRoomRequest) => {
+    const createRoom = useCallback(async (data: CreateRoomRequest) => {
         setIsLoading(true);
         setError(null);
         setIsSuccess(false);
@@ -31,7 +32,25 @@ export const useRoom = () => {
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [send]);
 
-    return { createRoom, isLoading, error, isSuccess };
+    const getAll = useCallback(async () => {
+        setIsLoading(true);
+        setError(null);
+
+        try {
+            const response = await send<null, any>(APIs.LIST_ROOMS, null);
+            return response.payload.data as ListRoomResponse;
+        } catch (errPacket: any) {
+            const backendMessage = 
+                errPacket?.error?.message || 
+                "Nie udało się pobrać listy węzłów.";
+            
+            setError(backendMessage);
+            return null;
+        } finally {
+            setIsLoading(false);
+        }
+    }, [send]);
+    return { createRoom, getAll, isLoading, error, isSuccess };
 };
