@@ -32,23 +32,27 @@ export const useRefreshToken = () => {
       );
 
       if (socket && socket.readyState === WebSocket.OPEN) {
-        registerPendingRequest(refreshPacket.meta.packet_id, (response) => {
-          if (response.status === 'OK') {
-            const newTokens = response.payload?.data;
-            
-            if (authContext) {
-              authContext.setAccessToken(newTokens.accessToken);
-              authContext.setRefreshToken(newTokens.refreshToken);
+        registerPendingRequest(refreshPacket.meta.packet_id, {
+          resolve: (response) => {
+            if (response.status === 'OK') {
+              const newTokens = response.payload?.data;
+              
+              if (authContext) {
+                authContext.setAccessToken(newTokens.access_token);
+                authContext.setRefreshToken(newTokens.refresh_token);
+              }
+              resolve(newTokens.access_token);
+            } else {
+              // logout user if refresh fails
+              if (authContext) authContext.logout();
+              reject(response);
             }
-            resolve(newTokens.accessToken);
-          } else {
-            // logout user if refresh fails
-            if (authContext) authContext.logout();
-            reject(response);
-          }
+          },
+          reject 
         });
 
         socket.send(JSON.stringify(refreshPacket));
+        console.log("WebSocket: Sent refresh token request.", refreshPacket);
       } else {
         reject(new Error("WebSocket jest zamknięty. Nie można odświeżyć sesji."));
       }
