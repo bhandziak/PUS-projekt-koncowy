@@ -1,8 +1,12 @@
 package pus.projekt.websocket.dto.PayloadData;
 
+import java.util.UUID;
+
 public record NewMessageRequestData(
         String room_id,
-        String sender_name,
-        String content
+        UUID message_id,
+        String author,
+        String content,
+        Integer timestamp
 ) {
 }

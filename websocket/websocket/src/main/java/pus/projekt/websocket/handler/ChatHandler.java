@@ -123,8 +123,10 @@ public class ChatHandler implements MessageHandler {
 
         NewMessageRequestData eventData = new NewMessageRequestData(
                 data.room_id(),
+                UUID.randomUUID(),
                 senderName,
-                data.content()
+                data.content(),
+                TimestampConverter.currentToSeconds()
         );
 
         Event.MetaEvent metaEvent = new Event.MetaEvent("1.0.0", TimestampConverter.currentToSeconds());
