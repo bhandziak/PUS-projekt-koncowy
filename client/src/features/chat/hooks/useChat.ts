@@ -16,14 +16,14 @@ export const useChat = () => {
         try {
             const response = await send<SendMessageRequest, any>(APIs.SEND_MESSAGE, data);
             
-            return response.payload.data as SendMessageResponse;
+            return response?.status === 'OK';
         } catch (errPacket: any) {
             const backendMessage = 
                 errPacket?.error?.message || 
                 "Nie udało się wysłać wiadomości.";
             
             setSendError(backendMessage);
-            return null;
+            return false;
         } finally {
             setIsSending(false);
         }

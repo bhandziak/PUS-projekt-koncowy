@@ -59,6 +59,7 @@ const ChatPage = () => {
         setActiveRoomId(id);
         joinRoom({ room_id: id });
         clearMessages();
+        setInput('');
     }
 
     const handleLeaveRoom = () => {
@@ -67,6 +68,7 @@ const ChatPage = () => {
         leaveRoom({ room_id: activeRoomId });
         setActiveRoomId(null);
         clearMessages();
+        setInput('');
     };
 
     const handleSendMessage = async (e: React.SubmitEvent<HTMLFormElement>) => {
@@ -183,6 +185,7 @@ const ChatPage = () => {
                                 author={msg.author}
                                 timestamp={new Date(msg.timestamp * 1000).toLocaleTimeString()}
                                 content={msg.content}
+                                isOwnMessage={authContext?.user?.username === msg.author}
                             />
                         ))}
                     </div>

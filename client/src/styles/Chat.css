@@ -110,7 +110,7 @@
 }
 
 .cyber-message-bubble {
-  @apply text-sm py-2.5 px-4 rounded-xl border block max-w-[85%] font-sans leading-relaxed text-zinc-300 bg-zinc-950/60 border-zinc-800/80 break-words whitespace-pre-wrap;
+  @apply text-sm py-2.5 px-4 rounded-xl border w-fit max-w-[85%] font-sans leading-relaxed text-zinc-300 bg-zinc-950/60 border-zinc-800/80 break-words whitespace-pre-wrap;
 
   &.system {
     @apply text-zinc-400 bg-zinc-900/40 border-zinc-800/50;
@@ -166,4 +166,20 @@
 
 .cyber-chat-description {
   @apply text-xs text-zinc-500 font-mono tracking-wide max-w-xs md:max-w-md truncate block;
+}
+
+.cyber-message-item.own-message {
+    align-items: flex-end;
+}
+
+.own-message .cyber-message-meta {
+    flex-direction: row-reverse;
+}
+
+.cyber-message-bubble.own-bubble {
+    text-align: right;
+}
+
+.own-message .cyber-message-author {
+  color: #b9eaff;
 }
