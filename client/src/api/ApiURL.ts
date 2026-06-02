@@ -39,12 +39,12 @@ const APIs = {
         type: 'ROOM', action: 'list'
     } as EndpointTemplate,
 
-    // MESSAGE
+    // CHAT
     SEND_MESSAGE: {
-        type: 'MESSAGE', action: 'send'
+        type: 'CHAT', action: 'send'
     } as EndpointTemplate,
     ON_NEW_MESSAGE: {
-        type: 'MESSAGE', action: 'new_message'
+        type: 'CHAT', action: 'new_message'
     } as EndpointTemplate,
 }
 
