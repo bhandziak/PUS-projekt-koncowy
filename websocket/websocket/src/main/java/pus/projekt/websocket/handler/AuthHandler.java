@@ -16,6 +16,7 @@ import pus.projekt.websocket.enums.Type;
 import pus.projekt.websocket.model.User;
 import pus.projekt.websocket.repository.UserRepository;
 import pus.projekt.websocket.service.JwtService;
+import pus.projekt.websocket.service.TokenStatus;
 import tools.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
@@ -188,14 +189,25 @@ public class AuthHandler implements MessageHandler {
         }
 
         String incomingRefreshToken = data.refreshToken();
+        TokenStatus tokenStatus = jwtService.validateToken(incomingRefreshToken);
 
-        if (!jwtService.isTokenValid(incomingRefreshToken)) {
+        if (tokenStatus == TokenStatus.EXPIRED) {
+            sendError(
+                    session,
+                    request.payload(),
+                    ErrorCode.TOKEN_EXPIRED,
+                    "Token odświeżenia wygasł",
+                    meta
+            );
+            return;
+        } else if (tokenStatus == TokenStatus.INVALID) {
             sendError(
                     session,
                     request.payload(),
                     ErrorCode.UNAUTHORIZED,
-                    "Token odświeżania wygasł lub jest nieprawidłowy",
-                    meta);
+                    "Token jest nieprawidłowy",
+                    meta
+            );
             return;
         }
 

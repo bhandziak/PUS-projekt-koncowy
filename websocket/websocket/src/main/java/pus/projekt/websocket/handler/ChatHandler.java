@@ -13,6 +13,7 @@ import pus.projekt.websocket.enums.Type;
 import pus.projekt.websocket.manager.SessionManager;
 import pus.projekt.websocket.repository.RoomRepository;
 import pus.projekt.websocket.service.JwtService;
+import pus.projekt.websocket.service.TokenStatus;
 import tools.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
@@ -51,7 +52,18 @@ public class ChatHandler implements MessageHandler {
         }
 
         String token = request.token();
-        if (token == null || !jwtService.isTokenValid(token)) {
+        TokenStatus tokenStatus = jwtService.validateToken(token);
+
+        if (tokenStatus == TokenStatus.EXPIRED) {
+            sendError(
+                    session,
+                    request.payload(),
+                    ErrorCode.TOKEN_EXPIRED,
+                    "Token autoryzacyjny wygasł",
+                    meta
+            );
+            return;
+        } else if (tokenStatus == TokenStatus.INVALID) {
             sendError(
                     session,
                     request.payload(),
