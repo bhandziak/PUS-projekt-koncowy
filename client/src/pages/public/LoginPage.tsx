@@ -71,7 +71,7 @@ const LoginPage = () => {
               value={formData.username}
               onChange={handleChange}
               className="dark-auth-input"
-              placeholder="NeonGhost"
+              placeholder="username"
             />
           </div>
 

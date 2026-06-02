@@ -92,7 +92,7 @@ const CreateRoomPage = () => {
                         value={formData.name}
                         onChange={handleChange}
                         className="dark-auth-input !pl-8"
-                        placeholder="cyber-tech"
+                        placeholder="tech-news"
                     />
                 </div>
             </div>
@@ -111,7 +111,7 @@ const CreateRoomPage = () => {
                 value={formData.description}
                 onChange={handleChange}
                 className="dark-auth-input"
-                placeholder="Dyskusje o modyfikacjach (max 50 znaków)..."
+                placeholder="Dyskusje o nowych technologiach (max 50 znaków)..."
                 />
             </div>
 

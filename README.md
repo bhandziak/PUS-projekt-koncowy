@@ -10,6 +10,7 @@
 - Java
 - Springboot
 - React
+- Postgresql
 
 ## Opis projektu
 
@@ -77,3 +78,47 @@ Metody walidacji obsługiwane przez aplikacje:
 - **Weryfikacja Wersji (`VersionValidator`)**: System odrzuca pakiety, których wersja protokołu w nagłówku `meta` nie jest kompatybilna z wersją obsługiwaną przez serwer (`BAD_VERSION`).
 - **Weryfikacja Stanu Tokenu (JWT)**: Token przesyłany w nagłówku żądania jest poddawany walidacji za pomocą `JwtService`. W zależności od wyniku, klient otrzymuje błąd `TOKEN_EXPIRED` lub `UNAUTHORIZED`.
 - **Kontrola Dostępu na Podstawie Ról**: Wrażliwe akcje biznesowe, takie jak tworzenie lub usuwanie pokoi, sprawdzają rolę zapisaną w tokenie JWT. Przykładowo użytkownik bez roli `ADMIN` otrzymuje odmowę dostępu w postaci błędu `FORBIDDEN` gdy chce usunąć pokój.
+
+# Warstwa frontendowa (klient)
+
+Klient spełnia poniższe założenia:
+
+- **Asynchroniczna komunikacja dwukierunkowa**: bazuje na niskopoziomowym kliencie WebSocket. Zapewnia to natychmiastową wymianę pakietów oraz pozwala na obsługę zdarzeń push inicjowanych bezpośrednio przez serwer (np. on new message).
+- **Separacja logiki biznesowej**: logika biznesowa i komunikacja z serwerem znajdują się dedykowanych hook'ach, a warstwa prezentacji w widokach Reactowych. Aplikacja korzysta z centralnego klienta websocket, działający jako singleton.
+- **Bezpieczeństwo i zarządzanie sesją**: Aplikacja implementuje system uwierzytelniania oparty na tokenach krótko- i długoterminowych (Access Token oraz Refresh Token) z obsługą ról (User, Admin). Dostęp do tych danych jest realizowany przez provider'ów.
+- **Komunikacja z użyciem Promise'ów**: Każde wysłane żądanie generuje unikalny identyfikator packet_id i automatycznie rejestruje funkcję zwrotną w globalnym rejestrze żądań oczekujących (pending requests). Pozwala to na asynchroniczne „oczekiwanie” na odpowiedź serwera w miejscu wywołania funkcji, a wbudowany mechanizm timeoutu (10 sekund) gwarantuje stabilność aplikacji i zapobiega wyciekom pamięci w przypadku braku odpowiedzi ze strony serwera.
+
+## Widoki aplikacji frontendowej
+
+1. Strona główna - inicjuje połączenie z backendem poprzez ustalenie wersji protokołu na endpoincie HANDSHAKE\hello.
+
+![home page](docs/home.png)
+
+2. Strona rejestracji - umożliwia rejestracje użytkownika (AUTH/register).
+
+![register page](docs/register.png)
+
+3. Strona logowania - umożliwia logowanie użytkownika i zapis tokenów (AUTH/login)
+
+![login page](docs/login.png)
+
+4. Strona chatu - umożliwia wybór pokoju (ROOM/join), wyjście z pokoju(ROOM/leave), wysłanie (CHAT/send) / odebranie (CHAT/new_message) wiadomości oraz wylogowanie się. Dla admina usunięcie pokoju (ROOM/delete) oraz przejście do formularza tworzenia nowego pokoju.
+
+![chat page](docs/chat.png)
+
+6. Formularz do tworzenia nowego pokoju - umożliwia adminowi dodanie nowego pokoju (ROON/create).
+
+![new room form](docs/new-room.png)
+
+## Logger
+
+W celu zapewnienia pełnej transparentności przesyłu danych oraz ułatwienia debugowania asynchronicznego potoku informacyjnego, we frontendzie zaimplementowano komponent wsLogger.ts.
+Logger automatycznie formatuje i koloruje pakiety wychodzące i przychodzące. Logger jest dostępny z poziomu konsoli deweloperskiej w przeglądarce.
+
+![logger](docs/logger.png)
+
+## Autorzy
+
+- Bartłomiej Handziak
+- Kacper Dziduch
+- Piotr Gąska

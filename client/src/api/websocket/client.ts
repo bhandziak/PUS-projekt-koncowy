@@ -35,12 +35,12 @@ socket.onmessage = (event) => {
             }
             
             if (responseData.status === 'OK') {
-                wsLogger.receiveSuccess(responseData.meta.endpoint, packetId, responseData);
+                wsLogger.receiveSuccess(responseData.type + '/' + responseData.payload.action, packetId, responseData);
             } else {
-                wsLogger.receiveFail(responseData.meta.endpoint, packetId, responseData);
+                wsLogger.receiveFail(responseData.type + '/' + responseData.payload.action, packetId, responseData);
             }
         } else {
-            wsLogger.broadcast(responseData.type, responseData);
+            wsLogger.broadcast(responseData.type + '/' + responseData.payload.action, responseData);
             // Handle broadcast messages
             if (responseData.type) {
                 const listeners = broadcastListeners.get(responseData.type);

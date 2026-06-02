@@ -64,7 +64,7 @@ export const useWebSocket = (isAuth: boolean = true) => {
             
             // 2. Send packet to the server
             socket.send(JSON.stringify(packet));
-            wsLogger.send(endpoint.action, packet);
+            wsLogger.send( endpoint.type + '/' + endpoint.action, packet);
         } else {
             console.warn("WebSocket: Brak aktywnego połączenia!");
             reject(new Error("Brak połączenia z serwerem"));

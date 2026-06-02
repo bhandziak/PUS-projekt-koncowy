@@ -29,7 +29,7 @@ const Navbar = () => {
               to={ROUTES.CHAT} 
               className="text-xl font-black text-sky-400 hover:text-sky-300 tracking-wider transition-colors focus:outline-none"
             >
-              Omega &Omega;
+              ChatIRC
             </Link>
           </div>
 

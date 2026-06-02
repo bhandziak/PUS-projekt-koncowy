@@ -36,7 +36,7 @@ export default function HomePage() {
 
         <div>
           <h1 className="text-4xl font-black tracking-tight text-zinc-100 mb-4">
-            Chat IRC - <span className="text-sky-400">Omega &Omega;</span>
+            Chat IRC
           </h1>
           <p className="text-sm text-zinc-400 leading-relaxed max-w-sm mx-auto">
             Aplikacja implementuje system czatu internetowego w czasie rzeczywistym w modelu klient-serwer.
