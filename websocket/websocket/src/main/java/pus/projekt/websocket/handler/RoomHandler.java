@@ -188,6 +188,23 @@ public class RoomHandler implements MessageHandler {
                 newRoom.getDescription() != null ? newRoom.getDescription() : ""
         );
         sendSuccess(session, PayloadAction.CREATE, responseData, meta);
+
+        RoomListUpdatedEventData eventData = new RoomListUpdatedEventData(
+                "added",
+                newRoom.getId().toString(),
+                newRoom.getName(),
+                newRoom.getDescription() != null ? newRoom.getDescription() : ""
+        );
+
+        Event.MetaEvent metaEvent = new Event.MetaEvent("1.0.0", TimestampConverter.currentToSeconds());
+        Event addEvent = new Event(
+                Type.ROOM,
+                Status.OK,
+                new Payload("list_updated", eventData),
+                metaEvent
+        );
+
+        sessionManager.broadcastToAll(addEvent);
     }
 
     private void handleDelete(WebSocketSession session, Request request, String token, Meta meta) throws IOException {
