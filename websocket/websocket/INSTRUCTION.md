@@ -1,9 +1,23 @@
+# Run instruction
+Run order:
+>run docker container           <br>
+>run backend app through IDE    <br>
+>run frontend from CMD
 ## Before starting backend open docker desktop and run:
 
 `docker compose up -d`
 
 this will start postgres db that is necessary for backend to exist
 
+## Frontend run instruction:
+- go to `/client` folder
+- open CMD
+- run `npm install`
+- run `npm run dev`
+- frontend then accessible through port shown in CMD
+
+
+---
 
 ## How to test backend in postman
 
