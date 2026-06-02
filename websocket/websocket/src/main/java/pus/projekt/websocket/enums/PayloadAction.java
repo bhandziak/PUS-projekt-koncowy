@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 public enum PayloadAction {
     LOGIN("login"),
     REGISTER("register"),
+    LOGOUT("logout"),
     REFRESH_TOKEN("refresh_token"),
     LIST("list"),
     CREATE("create"),

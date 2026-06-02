@@ -66,7 +66,7 @@ public class AuthHandler implements MessageHandler {
                     handleLogin(session, request, meta);
                     break;
                 case "logout":
-                    // TODO add logout
+                    handleLogout(session, meta);
                     break;
                 case "refresh_token":
                     handleRefreshToken(session, request, meta);
@@ -164,6 +164,13 @@ public class AuthHandler implements MessageHandler {
             user.getRole().toString()
         );
         sendSuccess(session, PayloadAction.LOGIN, responseData, meta);
+    }
+
+    private void handleLogout(WebSocketSession session, Meta meta) throws IOException {
+        // Z racji bezstanowości JWT, potwierdzamy klientowi wylogowanie.
+        // Frontend musi usunąć tokeny ze swojej pamięci
+        MessageResponseData responseData = new MessageResponseData("Wylogowano pomyślnie");
+        sendSuccess(session, PayloadAction.LOGOUT, responseData, meta);
     }
 
     private void handleRefreshToken(WebSocketSession session, Request request, Meta meta) throws IOException {
