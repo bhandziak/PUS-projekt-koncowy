@@ -127,7 +127,8 @@ public class RoomHandler implements MessageHandler {
                         room.getId().toString(),
                         room.getName(),
                         room.getOwnerName(),
-                        room.getOwnerId().toString()
+                        room.getOwnerId().toString(),
+                        room.getDescription() != null ? room.getDescription() : ""
                 ))
                 .collect(Collectors.toList());
 
