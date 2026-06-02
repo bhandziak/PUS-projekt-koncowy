@@ -190,7 +190,7 @@ public class RoomHandler implements MessageHandler {
         sendSuccess(session, PayloadAction.CREATE, responseData, meta);
 
         RoomListUpdatedEventData eventData = new RoomListUpdatedEventData(
-                "added",
+                "created",
                 newRoom.getId().toString(),
                 newRoom.getName(),
                 newRoom.getDescription() != null ? newRoom.getDescription() : ""
