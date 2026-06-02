@@ -20,7 +20,7 @@ public record Response(
             String message
     ) {}
 
-    public static Response success(Type type, String action, Map<String, Object> data, Meta meta) {
+    public static Response success(Type type, String action, Object data, Meta meta) {
         return new Response(type, Status.OK, new Payload(action, data), null, meta);
     }
 

@@ -13,7 +13,6 @@ public record Event(
 ) {
     public record MetaEvent (
             String version,
-            // TODO nie wiem jaki typ na timestamp chcemy
-            LocalDateTime timestamp
+            Integer timestamp
     ) {}
 }

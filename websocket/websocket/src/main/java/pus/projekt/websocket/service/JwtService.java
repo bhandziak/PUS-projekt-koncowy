@@ -1,5 +1,6 @@
 package pus.projekt.websocket.service;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Service;
@@ -39,15 +40,21 @@ public class JwtService {
                 .compact();
     }
 
-    public boolean isTokenValid(String token) {
+    public TokenStatus validateToken(String token) {
+        if (token == null || token.isBlank()) {
+            return TokenStatus.INVALID;
+        }
+
         try {
             Jwts.parser()
                     .verifyWith(key)
                     .build()
                     .parseSignedClaims(token);
-            return true;
+            return TokenStatus.VALID;
+        } catch (ExpiredJwtException exception) {
+            return TokenStatus.EXPIRED;
         } catch (Exception exception) {
-            return false;
+            return TokenStatus.INVALID;
         }
     }
 
@@ -58,6 +65,24 @@ public class JwtService {
                 .parseSignedClaims(token)
                 .getPayload()
                 .getSubject();
+    }
+
+    public String extractRole(String token) {
+        return Jwts.parser()
+                .verifyWith(key)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload()
+                .get("role", String.class);
+    }
+
+    public String extractUsername(String token) {
+        return Jwts.parser()
+                .verifyWith(key)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload()
+                .get("username", String.class);
     }
 }
 

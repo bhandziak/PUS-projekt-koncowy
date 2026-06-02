@@ -102,3 +102,118 @@ this will start postgres db that is necessary for backend to exist
   }
 }
 `
+
+### room/list
+
+`
+{
+  "type": "ROOM",
+  "payload": {
+    "action": "list",
+    "data": null
+  },
+  "token": "TUTAJ_WKLEJ_SWOJ_ACCESS_TOKEN",
+  "meta": {
+    "version": "1.0.0",
+    "packet_id": "a1b2c3d4-1234-5678-90ab-cdef12345678",
+    "timestamp": 1779963665
+  }
+}
+`
+
+### room/create
+
+`
+{
+  "type": "ROOM",
+  "payload": {
+    "action": "create",
+    "data": {
+      "name": "Programowanie w Springu",
+      "description": "Pokój do dyskusji o backendzie"
+    }
+  },
+  "token": "TUTAJ_WKLEJ_SWOJ_ACCESS_TOKEN_ADMINA",
+  "meta": {
+    "version": "1.0.0",
+    "packet_id": "f5e6d7c8-9012-3456-78ab-cdef90123456",
+    "timestamp": 1779963665
+  }
+}
+`
+
+### room/delete
+`
+{
+  "type": "ROOM",
+  "payload": {
+    "action": "delete",
+    "data": {
+      "room_id": "TUTAJ_WKLEJ_UUID_POKOJU"
+    }
+  },
+  "token": "TUTAJ_WKLEJ_SWOJ_ACCESS_TOKEN_ADMINA",
+  "meta": {
+    "version": "1.0.0",
+    "packet_id": "b2c3d4e5-2345-6789-01bc-def234567890",
+    "timestamp": 1779963665
+  }
+`
+
+### room/join
+`
+{
+  "type": "ROOM",
+  "payload": {
+    "action": "join",
+    "data": {
+      "room_id": "TUTAJ_WKLEJ_UUID_POKOJU"
+    }
+  },
+  "token": "TUTAJ_WKLEJ_SWOJ_ACCESS_TOKEN",
+  "meta": {
+    "version": "1.0.0",
+    "packet_id": "c3d4e5f6-3456-7890-12cd-ef3456789012",
+    "timestamp": 1779963665
+  }
+}
+`
+
+### room/leave 
+`
+{
+   "type": "ROOM",
+   "payload": {
+      "action": "leave",
+      "data": {
+         "room_id": "TUTAJ_WKLEJ_UUID_POKOJU"
+      }
+   },
+   "token": "TUTAJ_WKLEJ_SWOJ_ACCESS_TOKEN",
+   "meta": {
+      "version": "1.0.0",
+      "packet_id": "d4e5f6a7-4567-8901-23de-f45678901234",
+      "timestamp": 1779963665
+   }
+}
+`
+
+### chat/send
+`
+{
+  "type": "CHAT",
+  "payload": {
+    "action": "send",
+    "data": {
+      "room_id": "TUTAJ_WKLEJ_UUID_POKOJU",
+      "content": "Cześć wszystkim, to moja pierwsza wiadomość na tym kanale!"
+    }
+  },
+  "token": "TUTAJ_WKLEJ_SWOJ_ACCESS_TOKEN",
+  "meta": {
+    "version": "1.0.0",
+    "packet_id": "e5f6a7b8-5678-9012-34ef-567890123456",
+    "timestamp": 1779963665
+  }
+}
+`
