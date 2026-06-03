@@ -49,6 +49,8 @@ const ChatPage = () => {
         if (success) {
             if (activeRoomId === activeRoom?.room_id) {
                 setActiveRoomId(null);
+                clearMessages();
+                setInput('');
             }
         }
     };

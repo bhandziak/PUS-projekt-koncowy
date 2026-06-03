@@ -58,7 +58,6 @@ socket.onerror = (error) => console.error('WebSocket: Error:', error);
 socket.onclose = () => console.warn('WebSocket: Connection closed.');
 
 
-// TODO: add retry logic for failed sends
 // Register a pending request
 export const registerPendingRequest = (
     packetId: string, 
