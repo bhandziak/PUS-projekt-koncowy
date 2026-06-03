@@ -117,6 +117,32 @@ Logger automatycznie formatuje i koloruje pakiety wychodzące i przychodzące. L
 
 ![logger](docs/logger.png)
 
+## Instrukcja uruchomienia
+
+0. Wymagania wstępne:
+- Node.js (v18 lub wyższa) oraz npm
+- Java 25
+- Docker Desktop
+- Środowisko IDE (np. IntelliJ IDEA)
+
+1. Baza Danych (Docker)
+
+- Przejdź do katalogu websocket/websocket
+- uruchom kontener `docker compose up -d`
+
+2. Backend (Spring Boot)
+
+- Otwórz projekt backendowy w swoim IDE.
+- Upewnij się, że masz skonfigurowane JDK 25.
+- Uruchom aplikację bezpośrednio za pomocą wbudowanego w IDE narzędzia "Run".
+
+3. Frontend (React)
+
+- Otwórz wiersz poleceń i przejdź do folderu /client.
+- Zainstaluj pakiety node `npm install`
+- Uruchom w trybie dev `npm run dev`
+- Aplikacja będzie dostępna w przeglądarce pod adresem `http://localhost:5173`
+
 ## Autorzy
 
 - Bartłomiej Handziak
